@@ -1,7 +1,15 @@
 import { join } from "node:path";
 import { app, BrowserWindow, ipcMain, session, shell, systemPreferences } from "electron";
+import { deleteDatasetExample, listDatasetExamples, saveDatasetExample, type SaveDatasetExampleInput } from "./dataset";
 
 const CAMERA_PRIVACY_SETTINGS_URL = "x-apple.systempreferences:com.apple.preference.security?Privacy_Camera";
+
+// Repo-relative rather than app.getPath('userData') so the developer can browse/curate
+// examples directly in Finder/the repo (Phase 2 goal - build a labeled frame dataset).
+// Only valid for an unpacked dev run; revisit if/when this app is ever packaged.
+function datasetDir(): string {
+  return join(app.getAppPath(), "capture-samples");
+}
 
 function createWindow(): void {
   const mainWindow = new BrowserWindow({
@@ -59,6 +67,10 @@ app.whenReady().then(() => {
   ipcMain.handle("camera:open-privacy-settings", () => {
     if (process.platform === "darwin") shell.openExternal(CAMERA_PRIVACY_SETTINGS_URL);
   });
+
+  ipcMain.handle("dataset:list", () => listDatasetExamples(datasetDir()));
+  ipcMain.handle("dataset:save", (_event, input: SaveDatasetExampleInput) => saveDatasetExample(datasetDir(), input));
+  ipcMain.handle("dataset:delete", (_event, id: string) => deleteDatasetExample(datasetDir(), id));
 
   createWindow();
 

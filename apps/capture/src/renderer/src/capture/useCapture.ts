@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef, useState, type RefObject } from "react";
 import { RingFrameBuffer, type FrameBufferStats } from "./frameBuffer";
 import { loadDeviceId, saveDeviceId } from "./deviceStorage";
+import { THUMBNAIL_WIDTH } from "./constants";
 import type { CameraAccessStatus, DeviceStatus } from "./types";
 
 // Configuration point (brief Section 7: "exact frame rate and buffer duration should be
@@ -9,7 +10,6 @@ import type { CameraAccessStatus, DeviceStatus } from "./types";
 const BUFFER_DURATION_MS = 2000;
 const BUFFER_MAX_FRAMES = 40;
 const TARGET_CAPTURE_FPS = 15;
-const THUMBNAIL_WIDTH = 320;
 const FPS_SAMPLE_WINDOW_MS = 1000;
 
 export interface Resolution {

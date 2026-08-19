@@ -193,3 +193,145 @@ button:hover {
   font-size: 13px;
   margin: 0;
 }
+
+.tabs {
+  display: flex;
+  gap: 4px;
+  border-bottom: 1px solid var(--border);
+  padding-bottom: 0;
+}
+
+.tabs__tab {
+  background: transparent;
+  border: none;
+  border-radius: 8px 8px 0 0;
+  padding: 8px 16px;
+  color: var(--muted);
+}
+
+.tabs__tab--active {
+  color: var(--text);
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-bottom-color: var(--panel);
+  margin-bottom: -1px;
+}
+
+.dropzone {
+  border: 1px dashed var(--border);
+  border-radius: 10px;
+  padding: 28px;
+  text-align: center;
+  cursor: pointer;
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.dropzone--active {
+  border-color: var(--red);
+  color: var(--text);
+}
+
+.review-card {
+  display: flex;
+  gap: 16px;
+}
+
+.review-card img {
+  width: 240px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  flex-shrink: 0;
+}
+
+.review-card__fields {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  flex: 1;
+}
+
+.review-card__meta {
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.review-card__fields select {
+  align-self: flex-start;
+}
+
+.review-card__actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 4px;
+}
+
+.gallery__group {
+  margin-bottom: 20px;
+}
+
+.gallery__group:last-child {
+  margin-bottom: 0;
+}
+
+.gallery__group h3 {
+  font-size: 13px;
+  margin: 0 0 8px;
+  letter-spacing: 0.02em;
+}
+
+.gallery__grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.gallery__item {
+  position: relative;
+  width: 120px;
+}
+
+.gallery__item img {
+  width: 100%;
+  border-radius: 6px;
+  border: 1px solid var(--border);
+  cursor: pointer;
+  display: block;
+}
+
+.gallery__delete {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  width: 20px;
+  height: 20px;
+  padding: 0;
+  line-height: 1;
+  border-radius: 50%;
+  background: rgba(10, 13, 20, 0.85);
+  font-size: 14px;
+}
+
+.lightbox {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.85);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  cursor: zoom-out;
+  z-index: 10;
+}
+
+.lightbox img {
+  max-width: 90vw;
+  max-height: 80vh;
+  border-radius: 8px;
+}
+
+.lightbox__caption {
+  color: var(--muted);
+  font-size: 13px;
+}
