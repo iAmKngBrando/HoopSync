@@ -1,0 +1,15 @@
+{
+  "name": "hoopsync",
+  "private": true,
+  "version": "0.1.0",
+  "packageManager": "pnpm@9.12.0",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "dev:capture": "pnpm --filter @hoopsync/capture dev",
+    "build:capture": "pnpm --filter @hoopsync/capture build",
+    "typecheck": "pnpm -r typecheck",
+    "test": "pnpm -r test"
+  }
+}

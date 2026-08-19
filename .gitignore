@@ -1,0 +1,19 @@
+node_modules/
+dist/
+out/
+build/
+.DS_Store
+*.log
+.env
+.env.local
+
+# electron-vite build artifacts
+apps/*/out/
+apps/*/dist/
+
+# local capture data (Phase 2 frame dataset - not committed by default)
+**/capture-samples/
+
+# db
+*.db
+*.db-journal
