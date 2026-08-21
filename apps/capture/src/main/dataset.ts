@@ -1,26 +1,15 @@
 import { randomUUID } from "node:crypto";
 import { existsSync } from "node:fs";
+import { extname, join } from "node:path";
 import { mkdir, readFile, rm, writeFile } from "node:fs/promises";
-import { join } from "node:path";
 
 /**
- * Screen-type taxonomy from the product brief (Section 8). Kept here as the source of
- * truth; the renderer mirrors it in src/renderer/src/dataset/screenTypes.ts since main
- * and renderer are separate TS programs.
+ * Screen type is an open string, not a fixed enum - see src/main/tags.ts, which manages
+ * the persisted, user-extensible tag registry. Kept as plain string (not a union) so new
+ * tags don't require a code change, mirroring GamedayBetTrackerr's convention of keeping
+ * categorical fields as plain strings validated by application logic.
  */
-export const SCREEN_TYPES = [
-  "GAME_SCOREBOARD",
-  "PLAYER_STATS",
-  "TEAM_STATS",
-  "PLAYER_BOX",
-  "GAME_LOADING_SCREEN",
-  "GAME_RESULT",
-  "GAME_START",
-  "GAME_END",
-  "PLAYER_BUILD_INFO",
-  "UNKNOWN",
-] as const;
-export type ScreenType = (typeof SCREEN_TYPES)[number];
+export type ScreenType = string;
 
 export interface DatasetExample {
   id: string;
@@ -37,6 +26,17 @@ export interface DatasetExample {
 export interface SaveDatasetExampleInput {
   /** Full-resolution image as a data URL - "data:image/jpeg;base64,..." or "data:image/png;base64,...". */
   imageDataUrl: string;
+  thumbnailDataUrl: string;
+  screenType: ScreenType;
+  source: "live" | "upload";
+  width: number;
+  height: number;
+  originalFilename?: string;
+}
+
+export interface SaveDatasetExampleFromFileInput {
+  /** Absolute path to an already-on-disk full-resolution image (e.g. a session recording frame). */
+  sourcePath: string;
   thumbnailDataUrl: string;
   screenType: ScreenType;
   source: "live" | "upload";
@@ -72,43 +72,74 @@ function dataUrlToBuffer(dataUrl: string): { buffer: Buffer; extension: "png" | 
   return { buffer: Buffer.from(base64, "base64"), extension };
 }
 
-export async function listDatasetExamples(baseDir: string): Promise<DatasetExample[]> {
-  return readManifest(baseDir);
+interface PersistMeta {
+  screenType: ScreenType;
+  source: "live" | "upload";
+  width: number;
+  height: number;
+  thumbnailDataUrl: string;
+  originalFilename?: string;
 }
 
-/**
- * Persists one labeled example: writes the full-resolution image under
- * <baseDir>/<screenType>/<id>.<ext> and appends its metadata (including the caller-
- * supplied thumbnail, so the gallery never has to re-read full images from disk) to
- * <baseDir>/manifest.json.
- */
-export async function saveDatasetExample(
+async function persistExample(
   baseDir: string,
-  input: SaveDatasetExampleInput,
+  buffer: Buffer,
+  extension: string,
+  meta: PersistMeta,
 ): Promise<DatasetExample> {
-  const { buffer, extension } = dataUrlToBuffer(input.imageDataUrl);
   const id = randomUUID();
   const filename = `${id}.${extension}`;
-  const screenTypeDir = join(baseDir, input.screenType);
+  const screenTypeDir = join(baseDir, meta.screenType);
   await mkdir(screenTypeDir, { recursive: true });
   await writeFile(join(screenTypeDir, filename), buffer);
 
   const entry: DatasetExample = {
     id,
-    screenType: input.screenType,
-    source: input.source,
+    screenType: meta.screenType,
+    source: meta.source,
     filename,
-    width: input.width,
-    height: input.height,
+    width: meta.width,
+    height: meta.height,
     capturedAt: new Date().toISOString(),
-    thumbnailDataUrl: input.thumbnailDataUrl,
-    originalFilename: input.originalFilename,
+    thumbnailDataUrl: meta.thumbnailDataUrl,
+    originalFilename: meta.originalFilename,
   };
 
   const entries = await readManifest(baseDir);
   entries.push(entry);
   await writeManifest(baseDir, entries);
   return entry;
+}
+
+export async function listDatasetExamples(baseDir: string): Promise<DatasetExample[]> {
+  return readManifest(baseDir);
+}
+
+/**
+ * Persists one labeled example from an in-memory data URL (the "capture still" / "upload"
+ * flows): writes the full-resolution image under <baseDir>/<screenType>/<id>.<ext> and
+ * appends its metadata to <baseDir>/manifest.json.
+ */
+export async function saveDatasetExample(
+  baseDir: string,
+  input: SaveDatasetExampleInput,
+): Promise<DatasetExample> {
+  const { buffer, extension } = dataUrlToBuffer(input.imageDataUrl);
+  return persistExample(baseDir, buffer, extension, input);
+}
+
+/**
+ * Same as saveDatasetExample, but the full-resolution image is already a file on disk
+ * (used when committing frames out of a session recording) - avoids a wasteful
+ * base64 round-trip for what may be hundreds of frames.
+ */
+export async function saveDatasetExampleFromFile(
+  baseDir: string,
+  input: SaveDatasetExampleFromFileInput,
+): Promise<DatasetExample> {
+  const buffer = await readFile(input.sourcePath);
+  const extension = extname(input.sourcePath).slice(1) || "jpg";
+  return persistExample(baseDir, buffer, extension, input);
 }
 
 export async function deleteDatasetExample(baseDir: string, id: string): Promise<void> {

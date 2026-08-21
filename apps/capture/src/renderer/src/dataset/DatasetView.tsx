@@ -3,9 +3,14 @@ import type { DeviceStatus } from "../capture/types";
 import { DatasetGallery } from "./DatasetGallery";
 import { captureFromVideo, loadImageFile } from "./imageUtils";
 import { ReviewCard, type PendingExample } from "./ReviewCard";
-import type { ScreenType } from "./screenTypes";
+import { SessionRecorderControls } from "./SessionRecorderControls";
+import { SessionReviewer } from "./SessionReviewer";
+import { TagManager } from "./TagManager";
+import type { ScreenType } from "./types";
 import { UploadDropzone } from "./UploadDropzone";
 import { useDataset } from "./useDataset";
+import { useSessionRecording } from "./useSessionRecording";
+import { useTags } from "./useTags";
 
 interface DatasetViewProps {
   videoRef: RefObject<HTMLVideoElement>;
@@ -14,8 +19,12 @@ interface DatasetViewProps {
 
 export function DatasetView({ videoRef, captureStatus }: DatasetViewProps) {
   const dataset = useDataset();
+  const tagsState = useTags();
+  const recording = useSessionRecording(videoRef);
   const [pending, setPending] = useState<PendingExample | null>(null);
   const [uploadError, setUploadError] = useState<string | null>(null);
+  const [showTagManager, setShowTagManager] = useState(false);
+  const [justFinishedSessionId, setJustFinishedSessionId] = useState<string | null>(null);
 
   function captureStill() {
     const video = videoRef.current;
@@ -51,6 +60,12 @@ export function DatasetView({ videoRef, captureStatus }: DatasetViewProps) {
     setPending(null);
   }
 
+  function handleStopRecording() {
+    const finishedId = recording.sessionId;
+    recording.stop();
+    setJustFinishedSessionId(finishedId);
+  }
+
   return (
     <>
       <section className="panel">
@@ -68,11 +83,41 @@ export function DatasetView({ videoRef, captureStatus }: DatasetViewProps) {
         {uploadError && <p className="error">{uploadError}</p>}
       </section>
 
-      {pending && <ReviewCard pending={pending} onSave={handleSave} onDiscard={() => setPending(null)} />}
+      {pending && (
+        <ReviewCard
+          pending={pending}
+          tags={tagsState.tags}
+          onCreateTag={(name, description) => tagsState.addTag(name, description)}
+          onSave={handleSave}
+          onDiscard={() => setPending(null)}
+        />
+      )}
+
+      <SessionRecorderControls
+        isRecording={recording.isRecording}
+        frameCount={recording.frameCount}
+        captureStatus={captureStatus}
+        onStart={recording.start}
+        onStop={handleStopRecording}
+      />
+
+      <SessionReviewer
+        tags={tagsState.tags}
+        onCreateTag={(name, description) => tagsState.addTag(name, description)}
+        activeSessionId={justFinishedSessionId}
+      />
+
+      <section className="panel">
+        <div className="panel__row">
+          <h2>Tags</h2>
+          <button onClick={() => setShowTagManager((v) => !v)}>{showTagManager ? "Hide" : "Manage tags"}</button>
+        </div>
+        {showTagManager && <TagManager tags={tagsState.tags} onUpdateDescription={tagsState.updateDescription} />}
+      </section>
 
       <section className="panel">
         <h2>Dataset {dataset.loading ? "(loading…)" : `(${dataset.examples.length} examples)`}</h2>
-        <DatasetGallery examples={dataset.examples} onDelete={dataset.remove} />
+        <DatasetGallery examples={dataset.examples} tags={tagsState.tags} onDelete={dataset.remove} />
       </section>
     </>
   );

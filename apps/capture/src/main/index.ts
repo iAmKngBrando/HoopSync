@@ -1,6 +1,23 @@
 import { join } from "node:path";
 import { app, BrowserWindow, ipcMain, session, shell, systemPreferences } from "electron";
-import { deleteDatasetExample, listDatasetExamples, saveDatasetExample, type SaveDatasetExampleInput } from "./dataset";
+import {
+  deleteDatasetExample,
+  listDatasetExamples,
+  saveDatasetExample,
+  saveDatasetExampleFromFile,
+  type SaveDatasetExampleInput,
+} from "./dataset";
+import {
+  appendSessionFrame,
+  discardSession,
+  discardSessionFrames,
+  listSessionFrames,
+  listSessions,
+  sessionFramePath,
+  startSession,
+  type AppendSessionFrameInput,
+} from "./sessionRecording";
+import { addTag, listTags, updateTagDescription } from "./tags";
 
 const CAMERA_PRIVACY_SETTINGS_URL = "x-apple.systempreferences:com.apple.preference.security?Privacy_Camera";
 
@@ -9,6 +26,17 @@ const CAMERA_PRIVACY_SETTINGS_URL = "x-apple.systempreferences:com.apple.prefere
 // Only valid for an unpacked dev run; revisit if/when this app is ever packaged.
 function datasetDir(): string {
   return join(app.getAppPath(), "capture-samples");
+}
+
+// Scratch staging area for session recordings, kept separate from capture-samples so raw
+// unlabeled dumps never mix with the curated dataset - see the record/review/commit flow.
+function sessionRecordingsDir(): string {
+  return join(app.getAppPath(), "session-recordings");
+}
+
+// Small, git-tracked config (not raw capture data) - the user-extensible tag registry.
+function tagsDir(): string {
+  return join(app.getAppPath(), "dataset-config");
 }
 
 function createWindow(): void {
@@ -71,6 +99,50 @@ app.whenReady().then(() => {
   ipcMain.handle("dataset:list", () => listDatasetExamples(datasetDir()));
   ipcMain.handle("dataset:save", (_event, input: SaveDatasetExampleInput) => saveDatasetExample(datasetDir(), input));
   ipcMain.handle("dataset:delete", (_event, id: string) => deleteDatasetExample(datasetDir(), id));
+
+  ipcMain.handle("tags:list", () => listTags(tagsDir()));
+  ipcMain.handle("tags:add", (_event, name: string, description: string) => addTag(tagsDir(), name, description));
+  ipcMain.handle("tags:update-description", (_event, name: string, description: string) =>
+    updateTagDescription(tagsDir(), name, description),
+  );
+
+  ipcMain.handle("session:start", () => startSession(sessionRecordingsDir()));
+  ipcMain.handle("session:append-frame", (_event, sessionId: string, input: AppendSessionFrameInput) =>
+    appendSessionFrame(sessionRecordingsDir(), sessionId, input),
+  );
+  ipcMain.handle("session:list", () => listSessions(sessionRecordingsDir()));
+  ipcMain.handle("session:list-frames", (_event, sessionId: string) =>
+    listSessionFrames(sessionRecordingsDir(), sessionId),
+  );
+  ipcMain.handle("session:discard-frames", (_event, sessionId: string, frameIds: string[]) =>
+    discardSessionFrames(sessionRecordingsDir(), sessionId, frameIds),
+  );
+  ipcMain.handle("session:discard", (_event, sessionId: string) => discardSession(sessionRecordingsDir(), sessionId));
+  ipcMain.handle(
+    "session:commit-frames",
+    async (_event, sessionId: string, frameIds: string[], screenType: string) => {
+      const frames = await listSessionFrames(sessionRecordingsDir(), sessionId);
+      const idSet = new Set(frameIds);
+      const saved = [];
+      for (const frame of frames) {
+        if (!idSet.has(frame.id)) continue;
+        saved.push(
+          await saveDatasetExampleFromFile(datasetDir(), {
+            sourcePath: sessionFramePath(sessionRecordingsDir(), sessionId, frame.filename),
+            thumbnailDataUrl: frame.thumbnailDataUrl,
+            screenType,
+            source: "live",
+            width: frame.width,
+            height: frame.height,
+          }),
+        );
+      }
+      // Committed frames move into capture-samples/ - remove them from the session
+      // staging area now that they've been copied, so re-review only shows what's left.
+      await discardSessionFrames(sessionRecordingsDir(), sessionId, frameIds);
+      return saved;
+    },
+  );
 
   createWindow();
 

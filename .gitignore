@@ -13,6 +13,8 @@ apps/*/dist/
 
 # local capture data (Phase 2 frame dataset - not committed by default)
 **/capture-samples/
+# raw session-recording staging area (unlabeled, discarded after review) - see dataset-config/ for the tracked tag registry
+**/session-recordings/
 
 # db
 *.db

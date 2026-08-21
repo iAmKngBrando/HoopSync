@@ -335,3 +335,122 @@ button:hover {
   color: var(--muted);
   font-size: 13px;
 }
+
+.tag-select {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 220px;
+}
+
+.tag-select__hint {
+  margin: 0;
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.tag-select__create {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 10px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+}
+
+.tag-select__create input,
+.tag-select__create textarea {
+  background: #1a1f2c;
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 8px 10px;
+  font-size: 13px;
+  font-family: inherit;
+  resize: vertical;
+}
+
+.tag-select__create-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.tag-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+
+.tag-table th {
+  text-align: left;
+  color: var(--muted);
+  font-weight: 500;
+  font-size: 12px;
+  padding: 6px 10px;
+  border-bottom: 1px solid var(--border);
+}
+
+.tag-table td {
+  padding: 8px 10px;
+  border-bottom: 1px solid var(--border);
+  vertical-align: top;
+}
+
+.tag-table__name {
+  white-space: nowrap;
+  font-weight: 600;
+}
+
+.tag-table__custom {
+  color: var(--muted);
+  font-weight: 400;
+  font-size: 11px;
+}
+
+.tag-table textarea {
+  width: 100%;
+  background: #1a1f2c;
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 6px 8px;
+  font-size: 13px;
+  font-family: inherit;
+}
+
+.gallery__grid--selectable {
+  flex-wrap: wrap;
+}
+
+.session-frame {
+  position: relative;
+  width: 100px;
+  cursor: pointer;
+  display: block;
+}
+
+.session-frame img {
+  width: 100%;
+  border-radius: 6px;
+  border: 2px solid var(--border);
+  display: block;
+}
+
+.session-frame--selected img {
+  border-color: var(--red);
+}
+
+.session-frame input {
+  position: absolute;
+  top: 4px;
+  left: 4px;
+}
+
+.session-reviewer__actions {
+  align-items: flex-start;
+}
+
+.recording-active {
+  border-color: var(--red);
+  color: var(--red);
+}

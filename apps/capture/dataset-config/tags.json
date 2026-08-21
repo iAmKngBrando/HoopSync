@@ -1,0 +1,57 @@
+[
+  {
+    "name": "GAME_SCOREBOARD",
+    "description": "Score, quarter, and game clock overlay.",
+    "builtin": true
+  },
+  {
+    "name": "PLAYER_STATS",
+    "description": "A single player's full stat line screen.",
+    "builtin": true
+  },
+  {
+    "name": "TEAM_STATS",
+    "description": "Full team stat table / box score screen.",
+    "builtin": true
+  },
+  {
+    "name": "PLAYER_BOX",
+    "description": "Small corner player stat box shown during live play.",
+    "builtin": true
+  },
+  {
+    "name": "GAME_LOADING_SCREEN",
+    "description": "Loading or pre-game info screen.",
+    "builtin": true
+  },
+  {
+    "name": "GAME_RESULT",
+    "description": "Post-game result / summary screen.",
+    "builtin": true
+  },
+  {
+    "name": "GAME_START",
+    "description": "Screen shown as a game begins.",
+    "builtin": true
+  },
+  {
+    "name": "GAME_END",
+    "description": "Screen shown as a game ends.",
+    "builtin": true
+  },
+  {
+    "name": "PLAYER_BUILD_INFO",
+    "description": "MyPlayer build/archetype info screen.",
+    "builtin": true
+  },
+  {
+    "name": "MENU_OR_FREE_ROAM",
+    "description": "Menus, lobby, MyPark/free-roam - not an active game.",
+    "builtin": true
+  },
+  {
+    "name": "UNKNOWN",
+    "description": "Doesn't clearly match any known screen type yet.",
+    "builtin": true
+  }
+]

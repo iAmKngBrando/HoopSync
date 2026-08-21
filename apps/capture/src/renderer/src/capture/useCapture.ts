@@ -154,8 +154,20 @@ export function useCapture(): CaptureState & CaptureControls {
       setError(null);
       setStatus("CONNECTING");
       try {
+        // Without explicit ideal constraints, Chromium defaults to a low webcam-style
+        // resolution (640x480) instead of negotiating the Elgato's native output - fatal
+        // for later OCR work, which needs to read small in-game text. "ideal" (not
+        // "exact") falls back gracefully if a device can't do 1080p60 rather than
+        // throwing an OverconstrainedError.
+        const videoConstraints: MediaTrackConstraints = {
+          width: { ideal: 1920 },
+          height: { ideal: 1080 },
+          frameRate: { ideal: 60 },
+        };
+        if (deviceId) videoConstraints.deviceId = { exact: deviceId };
+
         const stream = await navigator.mediaDevices.getUserMedia({
-          video: deviceId ? { deviceId: { exact: deviceId } } : true,
+          video: videoConstraints,
           audio: false,
         });
         const video = videoRef.current;

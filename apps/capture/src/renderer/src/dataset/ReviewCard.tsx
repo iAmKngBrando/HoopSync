@@ -1,6 +1,7 @@
 import { useState } from "react";
-import { SCREEN_TYPES, type ScreenType } from "./screenTypes";
 import type { CapturedImage } from "./imageUtils";
+import { TagSelect } from "./TagSelect";
+import type { ScreenTag, ScreenType } from "./types";
 
 export interface PendingExample {
   image: CapturedImage;
@@ -10,11 +11,13 @@ export interface PendingExample {
 
 interface ReviewCardProps {
   pending: PendingExample;
+  tags: ScreenTag[];
+  onCreateTag: (name: string, description: string) => Promise<void>;
   onSave: (screenType: ScreenType) => void;
   onDiscard: () => void;
 }
 
-export function ReviewCard({ pending, onSave, onDiscard }: ReviewCardProps) {
+export function ReviewCard({ pending, tags, onCreateTag, onSave, onDiscard }: ReviewCardProps) {
   const [screenType, setScreenType] = useState<ScreenType>("UNKNOWN");
 
   return (
@@ -28,13 +31,7 @@ export function ReviewCard({ pending, onSave, onDiscard }: ReviewCardProps) {
             {pending.originalFilename ? ` · ${pending.originalFilename}` : ""}
           </div>
           <label htmlFor="screen-type-select">Screen type</label>
-          <select id="screen-type-select" value={screenType} onChange={(e) => setScreenType(e.target.value as ScreenType)}>
-            {SCREEN_TYPES.map((type) => (
-              <option key={type} value={type}>
-                {type}
-              </option>
-            ))}
-          </select>
+          <TagSelect id="screen-type-select" tags={tags} value={screenType} onChange={setScreenType} onCreateTag={onCreateTag} />
           <div className="review-card__actions">
             <button onClick={() => onSave(screenType)}>Save to dataset</button>
             <button onClick={onDiscard}>Discard</button>
