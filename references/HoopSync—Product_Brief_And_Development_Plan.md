@@ -1267,6 +1267,24 @@ Do not attempt every possible NBA 2K screen immediately.
 
 Measure detection accuracy.
 
+**Status: first pass complete**, built against 67 real captures across 6 tags. Two empirical findings changed the plan from what was assumed above:
+
+- **GAME_SCOREBOARD and PLAYER_BOX are not separable whole-frame screens** - every real example of each shows the identical persistent on-court HUD (top-left chemistry/rank box *and* bottom score bar, always together). They're two ROIs within one frame state, not two mutually-exclusive screen classes. Implemented as a single `onCourtHud` detector (`apps/capture/src/detection/detectors/onCourtHud.ts`); the two tags remain in the dataset as human ROI-focus labels, and Phase 4's two parsers (Section 10) will crop both regions from every frame this detector fires on.
+- **~9 of the original "GAME_LOADING_SCREEN" examples were mislabeled** - they were actually the "YOU LOST"/"Winner's Circle" post-game result screen, discovered via saturation-signature clustering (three distinct clusters existed under one tag) and confirmed visually. Relabeled to `GAME_RESULT` directly in the dataset.
+
+Six detectors implemented in `apps/capture/src/detection/detectors/`, each a pure, deterministic function over `{width, height, data}` pixels (no OCR/ML yet, per the Section 34a decision) - `onCourtHud`, `teamStats`, `playerBuildInfo`, `gameLoadingScreen`, `gameResult`, `menuOrFreeRoam`. Measured recall against every real example in the local dataset (`apps/capture/src/detection/accuracy.test.ts`, runs automatically with `pnpm test` when `capture-samples/` exists locally):
+
+| Detector | Own-category recall | Notable cross-category false positives |
+| --- | --- | --- |
+| onCourtHud | 100% (10/10 GAME_SCOREBOARD), 93% (13/14 PLAYER_BOX) | none significant |
+| gameLoadingScreen | 100% (12/12) | none |
+| gameResult | 100% (9/9) | none significant |
+| teamStats | 88% (7/8) | none significant |
+| playerBuildInfo | 100% (9/9) | none significant |
+| menuOrFreeRoam | 100% (5/5) | 40% (2/5) also match playerBuildInfo - thin data (5 examples), needs more before trusting either way |
+
+Not yet covered: `PLAYER_STATS`, `GAME_START`, `GAME_END` have no captured examples at all; `is_game_live`/`game_type` (Section 9) remain unbuilt - `onCourtHud` covers part of `is_game_live`'s job but `MENU_OR_FREE_ROAM` only represents one negative case, not menus/lobby distinctly. Next real data-collection pass should prioritize these plus more `MENU_OR_FREE_ROAM` examples to resolve the playerBuildInfo confusion.
+
 ---
 
 ## Phase 4 — Scoreboard Parser
