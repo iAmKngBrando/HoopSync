@@ -5,5 +5,5 @@
     "types": ["electron-vite/node"],
     "outDir": "out/tsc-node"
   },
-  "include": ["src/main/**/*", "src/preload/**/*", "electron.vite.config.ts"]
+  "include": ["src/main/**/*", "src/preload/**/*", "src/parsing/**/*", "src/detection/**/*", "electron.vite.config.ts"]
 }
