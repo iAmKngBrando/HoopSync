@@ -13,10 +13,16 @@ export type LiveTrackingStatus =
   | { kind: "ok"; message: string }
   | { kind: "error"; message: string };
 
+export type RemoteCaptureState = "connected" | "recording" | "processing" | "idle" | "disconnected" | null;
+
 export interface LiveTrackingControls {
   running: boolean;
   status: LiveTrackingStatus;
   framesSent: number;
+  /** What apps/server reports right now - lets the UI notice someone else (e.g. the
+   * dashboard's own Settings > Capture Device) is already streaming. Null until the
+   * first poll answers. */
+  remoteState: RemoteCaptureState;
   start: () => void;
   stop: () => void;
 }
@@ -25,6 +31,7 @@ export function useLiveTracking(videoRef: RefObject<HTMLVideoElement>): LiveTrac
   const [running, setRunning] = useState(false);
   const [status, setStatus] = useState<LiveTrackingStatus>({ kind: "idle" });
   const [framesSent, setFramesSent] = useState(0);
+  const [remoteState, setRemoteState] = useState<RemoteCaptureState>(null);
 
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const sendingRef = useRef(false);
@@ -97,5 +104,28 @@ export function useLiveTracking(videoRef: RefObject<HTMLVideoElement>): LiveTrac
   // Stop sending if the component unmounts mid-session.
   useEffect(() => stop, [stop]);
 
-  return { running, status, framesSent, start, stop };
+  // Poll what the server itself reports, independent of whether this instance is the
+  // one sending - lets the panel say "already live elsewhere" (e.g. the dashboard's own
+  // Settings > Capture Device) instead of just offering a Start button regardless.
+  useEffect(() => {
+    let cancelled = false;
+    const poll = async () => {
+      try {
+        const response = await fetch(`${SERVER_URL}/api/live`);
+        if (!response.ok) throw new Error();
+        const data = await response.json();
+        if (!cancelled) setRemoteState(data.capture_state ?? null);
+      } catch {
+        if (!cancelled) setRemoteState(null);
+      }
+    };
+    poll();
+    const timer = window.setInterval(poll, 5000);
+    return () => {
+      cancelled = true;
+      window.clearInterval(timer);
+    };
+  }, []);
+
+  return { running, status, framesSent, remoteState, start, stop };
 }

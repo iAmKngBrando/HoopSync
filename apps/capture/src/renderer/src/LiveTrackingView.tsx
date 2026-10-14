@@ -8,6 +8,7 @@ interface LiveTrackingViewProps {
 
 export function LiveTrackingView({ videoRef, captureConnected }: LiveTrackingViewProps) {
   const tracking = useLiveTracking(videoRef);
+  const liveElsewhere = !tracking.running && (tracking.remoteState === "recording" || tracking.remoteState === "processing");
 
   return (
     <section className="panel">
@@ -15,7 +16,9 @@ export function LiveTrackingView({ videoRef, captureConnected }: LiveTrackingVie
       <p className="muted">
         Streams the connected capture device to the HoopSync server (apps/server) for live screen
         reading and session tracking, the same way the dashboard's Live Dashboard and OT Analytics
-        get their data. Start it with <code>pnpm dev:server</code>.
+        get their data. Start it with <code>pnpm dev:server</code>. The dashboard's own Settings &gt;
+        Capture Device panel can do this too - both read/write the same server state, so whichever
+        one is streaming, the other will show it as connected.
       </p>
 
       <div className="panel__row">
@@ -27,6 +30,7 @@ export function LiveTrackingView({ videoRef, captureConnected }: LiveTrackingVie
           </button>
         )}
         {!captureConnected && <p className="muted">Connect a capture device on the Capture tab first.</p>}
+        {liveElsewhere && <p className="muted">Already live - frames are streaming from elsewhere (e.g. the dashboard).</p>}
       </div>
 
       <dl className="diagnostics">

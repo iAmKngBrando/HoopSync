@@ -1,10 +1,11 @@
 import { useState } from 'react';
-import { Gamepad2, LayoutGrid, Settings, Trophy, Users, Video } from 'lucide-react';
+import { Gamepad2, LayoutGrid, Trophy, Users, Video } from 'lucide-react';
 import { AppShell } from './components/AppShell';
 import { LiveDashboardRouter } from './components/LiveDashboardRouter';
 import { MinimalDashboard } from './components/MinimalDashboard';
 import { PlaceholderView } from './components/PlaceholderView';
 import { OtAnalyticsView } from './features/ot-analytics/OtAnalyticsView';
+import { SettingsView } from './features/capture/SettingsView';
 import { TrackerDataProvider } from './features/tracker-data/TrackerDataContext';
 import type { NavKey, ViewMode } from './types';
 
@@ -14,7 +15,6 @@ const placeholders: Partial<Record<NavKey, { icon: typeof Gamepad2; title: strin
   leaderboards: { icon: Trophy, title: 'Leaderboards', description: 'Season leaderboards are coming soon.' },
   teamStats: { icon: LayoutGrid, title: 'Team Stats', description: 'Aggregated team stats are coming soon.' },
   clips: { icon: Video, title: 'Clips', description: 'Your saved clip library is coming soon.' },
-  settings: { icon: Settings, title: 'Settings', description: 'Capture and account settings are coming soon.' },
 };
 
 function App() {
@@ -34,6 +34,8 @@ function App() {
           <LiveDashboardRouter />
         ) : active === 'otAnalytics' ? (
           <OtAnalyticsView />
+        ) : active === 'settings' ? (
+          <SettingsView />
         ) : placeholder ? (
           <PlaceholderView icon={placeholder.icon} title={placeholder.title} description={placeholder.description} />
         ) : null}
