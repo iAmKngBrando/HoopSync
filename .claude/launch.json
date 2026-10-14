@@ -1,0 +1,11 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "dashboard",
+      "runtimeExecutable": "npx",
+      "runtimeArgs": ["pnpm", "--filter", "@hoopsync/dashboard", "dev"],
+      "port": 5190
+    }
+  ]
+}

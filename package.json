@@ -9,6 +9,8 @@
   "scripts": {
     "dev:capture": "pnpm --filter @hoopsync/capture dev",
     "build:capture": "pnpm --filter @hoopsync/capture build",
+    "dev:dashboard": "pnpm --filter @hoopsync/dashboard dev",
+    "build:dashboard": "pnpm --filter @hoopsync/dashboard build",
     "typecheck": "pnpm -r typecheck",
     "test": "pnpm -r test"
   }

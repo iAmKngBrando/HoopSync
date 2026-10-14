@@ -1,0 +1,193 @@
+@import "tailwindcss";
+
+:root {
+  color-scheme: dark;
+
+  /* HoopSync theme tokens */
+  --background: #0a0d15;
+  --background-secondary: #0d1119;
+  --sidebar: #0b0e17;
+  --card: rgba(18, 23, 36, 0.78);
+  --card-hover: rgba(24, 30, 46, 0.86);
+  --inset: rgba(6, 9, 15, 0.65);
+  --foreground: #f3f5fa;
+  --foreground-secondary: #94a0b8;
+  --muted: rgba(148, 160, 184, 0.12);
+  --muted-foreground: #6b7690;
+  --primary: #ef3b3b;
+  --primary-hover: #ff5a52;
+  --accent-blue: #3b82f6;
+  --accent-blue-hover: #60a5fa;
+  --success: #22c55e;
+  --success-hover: #3ddb73;
+  --warning: #facc15;
+  --border: rgba(255, 255, 255, 0.08);
+  --border-soft: rgba(255, 255, 255, 0.05);
+  --border-primary: rgba(239, 59, 59, 0.35);
+  --border-blue: rgba(59, 130, 246, 0.3);
+  --ring: #ef3b3b;
+  --ring-offset: #0a0d15;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-background-secondary: var(--background-secondary);
+  --color-sidebar: var(--sidebar);
+  --color-card: var(--card);
+  --color-card-hover: var(--card-hover);
+  --color-inset: var(--inset);
+  --color-foreground: var(--foreground);
+  --color-foreground-secondary: var(--foreground-secondary);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-primary: var(--primary);
+  --color-primary-hover: var(--primary-hover);
+  --color-accent-blue: var(--accent-blue);
+  --color-accent-blue-hover: var(--accent-blue-hover);
+  --color-success: var(--success);
+  --color-success-hover: var(--success-hover);
+  --color-warning: var(--warning);
+  --color-border: var(--border);
+  --color-border-soft: var(--border-soft);
+  --color-border-primary: var(--border-primary);
+  --color-border-blue: var(--border-blue);
+  --color-ring: var(--ring);
+  --color-ring-offset: var(--ring-offset);
+
+  --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial,
+    sans-serif;
+  --font-display: "Avenir Next Condensed", "Arial Narrow", "Roboto Condensed", "Segoe UI",
+    system-ui, sans-serif;
+
+  --radius-card: 14px;
+  --radius-inset: 10px;
+}
+
+@layer base {
+  html,
+  body,
+  #root {
+    height: 100%;
+  }
+
+  body {
+    font-family: var(--font-sans);
+    font-size: 14px;
+    line-height: 1.45;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    color: var(--foreground);
+    background: var(--background);
+  }
+
+  button:not(:disabled) {
+    cursor: pointer;
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--ring);
+    outline-offset: 2px;
+  }
+
+  ::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: rgba(148, 160, 184, 0.18);
+    border: 2px solid transparent;
+    background-clip: padding-box;
+    border-radius: 999px;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: rgba(239, 59, 59, 0.35);
+    border: 2px solid transparent;
+    background-clip: padding-box;
+  }
+}
+
+@layer components {
+  .app-bg {
+    background:
+      radial-gradient(900px 520px at 8% -8%, rgba(239, 59, 59, 0.08), transparent 62%),
+      radial-gradient(900px 560px at 95% 0%, rgba(59, 130, 246, 0.08), transparent 60%),
+      linear-gradient(180deg, #0a0d15 0%, #090c13 100%);
+  }
+
+  .glass {
+    background: linear-gradient(180deg, rgba(22, 28, 44, 0.75) 0%, rgba(13, 17, 27, 0.78) 100%);
+    border: 1px solid var(--border-soft);
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.04),
+      0 18px 36px -24px rgba(0, 0, 0, 0.85);
+    backdrop-filter: blur(14px) saturate(130%);
+    -webkit-backdrop-filter: blur(14px) saturate(130%);
+  }
+
+  .glass-hover:hover {
+    background: var(--card-hover);
+    border-color: var(--border);
+  }
+
+  .panel-inset {
+    background: var(--inset);
+    border: 1px solid var(--border-soft);
+    border-radius: var(--radius-inset);
+  }
+
+  .brand-mark {
+    font-family: var(--font-display);
+    font-style: italic;
+    font-weight: 800;
+    letter-spacing: 0.01em;
+    line-height: 1;
+  }
+
+  .eyebrow {
+    font-size: 10.5px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--muted-foreground);
+  }
+
+  .noise-dots {
+    background-image: radial-gradient(rgba(255, 255, 255, 0.5) 1px, transparent 1px);
+    background-size: 14px 14px;
+  }
+}
+
+@layer utilities {
+  .glow-primary {
+    box-shadow: 0 0 20px rgba(239, 59, 59, 0.18);
+  }
+
+  .glow-blue {
+    box-shadow: 0 0 20px rgba(59, 130, 246, 0.18);
+  }
+
+  .glow-success {
+    box-shadow: 0 0 16px rgba(34, 197, 94, 0.35);
+  }
+
+  .text-glow-primary {
+    text-shadow: 0 0 10px rgba(239, 59, 59, 0.45);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
