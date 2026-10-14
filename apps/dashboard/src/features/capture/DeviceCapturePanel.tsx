@@ -19,6 +19,11 @@ export function DeviceCapturePanel() {
   const connected = capture.status === 'connected';
   // Someone other than this panel (e.g. the capture app) is already streaming.
   const liveElsewhere = !tracking.running && (captureState === 'recording' || captureState === 'processing');
+  // Browsers hide real device names (Elgato HD60 X, etc.) from a page until that page
+  // has been granted camera permission - before that every entry comes back with a
+  // blank label, which we'd otherwise silently show as a generic "Camera".
+  const noDevices = capture.devices.length === 0;
+  const needsPermission = !noDevices && capture.devices.every((d) => !d.label);
 
   return (
     <Card label="Capture device">
@@ -86,6 +91,22 @@ export function DeviceCapturePanel() {
           </div>
 
           {capture.error && <p className="text-xs text-destructive">{capture.error}</p>}
+
+          {noDevices && (
+            <p className="text-xs text-warning">
+              No camera devices found. If the Elgato is plugged in, make sure its own capture
+              software (Camera Hub / 4K Capture Utility) has the virtual camera output enabled.
+            </p>
+          )}
+          {needsPermission && (
+            <p className="text-xs text-warning">
+              Device names are hidden until the browser grants camera access to this page — pick
+              any entry and click Connect, allow the permission prompt, then real names (including
+              the Elgato) will appear here. If it still only shows "Camera" after that, check
+              System Settings → Privacy &amp; Security → Camera and make sure this browser is
+              allowed.
+            </p>
+          )}
 
           <div className="border-t border-border-soft pt-3">
             <div className="flex flex-wrap items-center gap-2">
