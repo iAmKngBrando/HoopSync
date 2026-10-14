@@ -3,11 +3,16 @@ import type { SessionHistoryEntry } from '../types';
 import { Card, SectionHeader } from './ui/Card';
 import { Avatar } from './ui/Avatar';
 
-const colors = ['#ef3b3b', '#3b82f6', '#a855f7', '#f97316'];
+const colors = ['#8b5cf6', '#3b82f6', '#a855f7', '#f97316'];
 
-export function SessionHistoryPanel({ sessions }: { sessions: SessionHistoryEntry[] }) {
+interface SessionHistoryPanelProps {
+  sessions: SessionHistoryEntry[];
+  className?: string;
+}
+
+export function SessionHistoryPanel({ sessions, className }: SessionHistoryPanelProps) {
   return (
-    <Card>
+    <Card className={className}>
       <SectionHeader title="SESSION HISTORY" />
       <div className="overflow-x-auto">
         <table className="w-full min-w-[520px] text-sm">

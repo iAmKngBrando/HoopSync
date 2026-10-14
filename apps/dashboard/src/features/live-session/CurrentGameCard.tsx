@@ -60,7 +60,7 @@ export function CurrentGameCard({ game, className }: CurrentGameCardProps) {
                   {game.yourLabel ?? 'You'}
                 </div>
               </div>
-              <PlayerSilhouette className="hidden w-[19cqw] text-primary/45 drop-shadow-[0_0_18px_rgba(239,59,59,0.4)] @lg:block" />
+              <PlayerSilhouette className="hidden w-[19cqw] text-primary/45 drop-shadow-[0_0_18px_rgba(139,92,246,0.4)] @lg:block" />
             </div>
           </div>
         ) : (

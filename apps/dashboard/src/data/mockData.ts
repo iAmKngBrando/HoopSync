@@ -9,7 +9,7 @@ import type {
 } from '../types';
 
 export const topPlayerCards: PlayerSummary[] = [
-  { id: 'p1', name: 'Brando', position: 'P1', avatarColor: '#ef3b3b', isMvp: true, isSelf: true, live: true, pts: 24, reb: 8, ast: 6 },
+  { id: 'p1', name: 'Brando', position: 'P1', avatarColor: '#8b5cf6', isMvp: true, isSelf: true, live: true, pts: 24, reb: 8, ast: 6 },
   { id: 'p2', name: 'JaySmooth', position: 'P2', avatarColor: '#3b82f6', live: true, pts: 18, reb: 3, ast: 7 },
   { id: 'p3', name: 'Swish_33', position: 'P3', avatarColor: '#a855f7', live: true, pts: 12, reb: 5, ast: 4 },
   { id: 'p4', name: 'AirBuckets', position: 'P4', avatarColor: '#f97316', live: true, pts: 9, reb: 6, ast: 2 },

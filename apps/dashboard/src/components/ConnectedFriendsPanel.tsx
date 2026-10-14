@@ -3,11 +3,16 @@ import type { ConnectedFriend } from '../types';
 import { Card, SectionHeader } from './ui/Card';
 import { Avatar } from './ui/Avatar';
 
-const colors = ['#3b82f6', '#a855f7', '#f97316', '#ef3b3b'];
+const colors = ['#3b82f6', '#a855f7', '#f97316', '#8b5cf6'];
 
-export function ConnectedFriendsPanel({ friends }: { friends: ConnectedFriend[] }) {
+interface ConnectedFriendsPanelProps {
+  friends: ConnectedFriend[];
+  className?: string;
+}
+
+export function ConnectedFriendsPanel({ friends, className }: ConnectedFriendsPanelProps) {
   return (
-    <Card>
+    <Card className={className}>
       <SectionHeader title="CONNECTED FRIENDS" action={<span className="text-xs font-semibold text-success">{friends.length} ONLINE</span>} />
       <ul className="flex flex-col gap-2.5">
         {friends.map((f, i) => (

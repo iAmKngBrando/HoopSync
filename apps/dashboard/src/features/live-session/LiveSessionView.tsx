@@ -3,25 +3,25 @@
 // squad (2v2/3v3/5v5) game is detected, which needs new vision/session work
 // the ported 2kOT pipeline doesn't do yet — see the product brief's §34b
 // "Deferred / Future To-Dos".
+//
+// Game History / Quick Stats / Recent Opponents live under OT Analytics now
+// (same data, so showing them here too would just duplicate that tab) -
+// Live Scoreboard, Session History and Connected Friends take their place,
+// brought back from the original squad dashboard.
 
 import { useTrackerData } from '../tracker-data/useTrackerData';
 import { CurrentGameCard } from './CurrentGameCard';
 import { MatchupPreviewCard } from './MatchupPreviewCard';
 import { EndGameResultCard } from './EndGameResultCard';
-import { RecentOpponentsList } from './RecentOpponentsList';
 import { OpponentQuickStats } from '../ot-analytics/OpponentQuickStats';
-import { QuickStatsCard } from '../ot-analytics/QuickStatsCard';
-import { GameHistoryTable } from '../ot-analytics/GameHistoryTable';
-import { Card } from '../../components/ui/Card';
+import { LiveScoreboard } from '../../components/LiveScoreboard';
+import { SessionHistoryPanel } from '../../components/SessionHistoryPanel';
+import { ConnectedFriendsPanel } from '../../components/ConnectedFriendsPanel';
+import { Card, SectionHeader } from '../../components/ui/Card';
+import { sessionHistory, connectedFriends } from '../../data/mockData';
 import { ServerOff } from 'lucide-react';
 
-interface LiveSessionViewProps {
-  onViewAllGames?: () => void;
-  onSelectGame?: (id: number) => void;
-  onViewAllOpponents?: () => void;
-}
-
-export function LiveSessionView({ onViewAllGames, onSelectGame, onViewAllOpponents }: LiveSessionViewProps) {
+export function LiveSessionView() {
   const { dashboard, connection } = useTrackerData();
 
   if (connection === 'offline') {
@@ -40,6 +40,9 @@ export function LiveSessionView({ onViewAllGames, onSelectGame, onViewAllOpponen
     );
   }
 
+  const game = dashboard.currentGame;
+  const isLive = game?.status === 'live';
+
   return (
     <div className="flex flex-col gap-4 p-5">
       {dashboard.isSample && (
@@ -49,22 +52,24 @@ export function LiveSessionView({ onViewAllGames, onSelectGame, onViewAllOpponen
       )}
 
       <div className="grid grid-cols-1 gap-4 xl:grid-cols-12">
-        <CurrentGameCard game={dashboard.currentGame} className="xl:col-span-8" />
+        <CurrentGameCard game={game} className="xl:col-span-8" />
         <OpponentQuickStats opponent={dashboard.focusOpponent} className="xl:col-span-4" />
+
+        <Card className="xl:col-span-12">
+          <SectionHeader title="LIVE SCOREBOARD" live={isLive} />
+          <LiveScoreboard
+            myScore={game?.yourScore ?? 0}
+            opponentScore={game?.opponentScore ?? 0}
+            quarter={game?.quarter ? `Q${game.quarter}` : undefined}
+            clock={game?.clock}
+          />
+        </Card>
 
         <EndGameResultCard result={dashboard.endGame} className="xl:col-span-6" />
         <MatchupPreviewCard matchup={dashboard.nextMatchup} className="xl:col-span-6" />
 
-        <GameHistoryTable
-          games={dashboard.history}
-          limit={5}
-          onViewAll={onViewAllGames}
-          onSelectGame={dashboard.isSample ? undefined : onSelectGame}
-          className="xl:col-span-12"
-        />
-
-        <QuickStatsCard stats={dashboard.stats} className="xl:col-span-6" />
-        <RecentOpponentsList opponents={dashboard.recentOpponents} onViewAll={onViewAllOpponents} className="xl:col-span-6" />
+        <SessionHistoryPanel sessions={sessionHistory} className="xl:col-span-8" />
+        <ConnectedFriendsPanel friends={connectedFriends} className="xl:col-span-4" />
       </div>
     </div>
   );

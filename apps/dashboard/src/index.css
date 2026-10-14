@@ -14,8 +14,8 @@
   --foreground-secondary: #94a0b8;
   --muted: rgba(148, 160, 184, 0.12);
   --muted-foreground: #6b7690;
-  --primary: #ef3b3b;
-  --primary-hover: #ff5a52;
+  --primary: #8b5cf6;
+  --primary-hover: #a78bfa;
   --accent-blue: #3b82f6;
   --accent-blue-hover: #60a5fa;
   --success: #22c55e;
@@ -24,18 +24,17 @@
   --border: rgba(255, 255, 255, 0.08);
   --border-soft: rgba(255, 255, 255, 0.05);
   --border-muted: rgba(255, 255, 255, 0.05);
-  --border-primary: rgba(239, 59, 59, 0.35);
+  --border-primary: rgba(139, 92, 246, 0.35);
   --border-blue: rgba(59, 130, 246, 0.3);
-  --ring: #ef3b3b;
+  --ring: #8b5cf6;
   --ring-offset: #0a0d15;
 
-  /* Aliases so ported OT Analytics code (originally red/blue "destructive" vs.
-     purple "secondary"/"magenta") maps onto HoopSync's two-tone red/blue
-     palette without per-usage edits: destructive -> primary (red = loss,
-     same as red = my team elsewhere), secondary/magenta -> accent-blue
-     (opponent = blue everywhere in HoopSync). */
-  --destructive: var(--primary);
-  --destructive-hover: var(--primary-hover);
+  /* Win/loss stays red/green regardless of brand color, so OT Analytics
+     records read correctly. secondary/magenta (from the ported OT Analytics
+     code, originally purple) -> accent-blue, since opponent = blue
+     everywhere in HoopSync. */
+  --destructive: #ef4444;
+  --destructive-hover: #f87171;
   --secondary: var(--accent-blue);
   --secondary-hover: var(--accent-blue-hover);
   --magenta: var(--accent-blue);
@@ -126,7 +125,7 @@
   }
 
   ::-webkit-scrollbar-thumb:hover {
-    background: rgba(239, 59, 59, 0.35);
+    background: rgba(139, 92, 246, 0.35);
     border: 2px solid transparent;
     background-clip: padding-box;
   }
@@ -135,7 +134,7 @@
 @layer components {
   .app-bg {
     background:
-      radial-gradient(900px 520px at 8% -8%, rgba(239, 59, 59, 0.08), transparent 62%),
+      radial-gradient(900px 520px at 8% -8%, rgba(139, 92, 246, 0.08), transparent 62%),
       radial-gradient(900px 560px at 95% 0%, rgba(59, 130, 246, 0.08), transparent 60%),
       linear-gradient(180deg, #0a0d15 0%, #090c13 100%);
   }
@@ -186,8 +185,8 @@
   .scene {
     background:
       radial-gradient(55% 85% at 20% 40%, rgba(59, 130, 246, 0.4), transparent 70%),
-      radial-gradient(40% 70% at 34% 20%, rgba(239, 59, 59, 0.2), transparent 70%),
-      radial-gradient(55% 80% at 82% 35%, rgba(239, 59, 59, 0.28), transparent 70%),
+      radial-gradient(40% 70% at 34% 20%, rgba(139, 92, 246, 0.2), transparent 70%),
+      radial-gradient(55% 80% at 82% 35%, rgba(139, 92, 246, 0.28), transparent 70%),
       linear-gradient(180deg, #0c1436 0%, #1a0c14 58%, #070b1a 100%);
   }
 
@@ -195,7 +194,7 @@
     background:
       radial-gradient(70% 55% at 50% 105%, rgba(255, 150, 60, 0.35), transparent 70%),
       radial-gradient(45% 60% at 12% 30%, rgba(59, 130, 246, 0.26), transparent 70%),
-      radial-gradient(45% 60% at 88% 30%, rgba(239, 59, 59, 0.26), transparent 70%),
+      radial-gradient(45% 60% at 88% 30%, rgba(139, 92, 246, 0.26), transparent 70%),
       linear-gradient(180deg, #0b1230 0%, #1c1210 60%, #190c10 100%);
   }
 
@@ -223,14 +222,14 @@
     line-height: 1;
     color: #fff;
     text-shadow:
-      0 0 18px rgba(239, 59, 59, 0.55),
+      0 0 18px rgba(139, 92, 246, 0.55),
       0 2px 0 rgba(0, 0, 0, 0.45);
   }
 }
 
 @layer utilities {
   .glow-primary {
-    box-shadow: 0 0 20px rgba(239, 59, 59, 0.18);
+    box-shadow: 0 0 20px rgba(139, 92, 246, 0.18);
   }
 
   .glow-blue {
@@ -242,7 +241,7 @@
   }
 
   .text-glow-primary {
-    text-shadow: 0 0 10px rgba(239, 59, 59, 0.45);
+    text-shadow: 0 0 10px rgba(139, 92, 246, 0.45);
   }
 }
 

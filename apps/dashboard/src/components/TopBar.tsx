@@ -49,7 +49,7 @@ export function TopBar({ viewMode, onViewModeChange }: TopBarProps) {
         </span>
 
         <button type="button" className="flex items-center gap-2 rounded-full border border-border-soft bg-inset py-1 pl-1 pr-2.5 hover:border-border">
-          <Avatar name="Brando" color="#ef3b3b" size={28} />
+          <Avatar name="Brando" color="#8b5cf6" size={28} />
           <span className="text-sm font-semibold text-foreground">Brando</span>
           <ChevronDown size={14} className="text-foreground-secondary" />
         </button>

@@ -2,7 +2,7 @@ import type { TopPerformer } from '../types';
 import { Card, SectionHeader, TextAction } from './ui/Card';
 import { Avatar } from './ui/Avatar';
 
-const palette = ['#ef3b3b', '#3b82f6', '#a855f7'];
+const palette = ['#8b5cf6', '#3b82f6', '#a855f7'];
 
 export function TopPerformersPanel({ performers }: { performers: TopPerformer[] }) {
   return (
