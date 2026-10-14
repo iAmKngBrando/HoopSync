@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { CaptureView } from "./CaptureView";
+import { LiveTrackingView } from "./LiveTrackingView";
 import { useCapture } from "./capture/useCapture";
 import type { DeviceStatus } from "./capture/types";
 import { DatasetView } from "./dataset/DatasetView";
@@ -15,7 +16,7 @@ function StatusDot({ status }: { status: DeviceStatus }) {
   return <span className={`status-dot status-dot--${status.toLowerCase()}`} />;
 }
 
-type Tab = "capture" | "dataset";
+type Tab = "capture" | "dataset" | "live";
 
 export default function App() {
   const capture = useCapture();
@@ -40,18 +41,24 @@ export default function App() {
         <button className={tab === "dataset" ? "tabs__tab tabs__tab--active" : "tabs__tab"} onClick={() => setTab("dataset")}>
           Dataset
         </button>
+        <button className={tab === "live" ? "tabs__tab tabs__tab--active" : "tabs__tab"} onClick={() => setTab("live")}>
+          Live Tracking
+        </button>
       </nav>
 
-      {/* Both views stay mounted at all times, toggled via `hidden` rather than
+      {/* All three views stay mounted at all times, toggled via `hidden` rather than
           conditional rendering - the live <video> element lives inside CaptureView, and
           unmounting it would drop the stream binding and stop the capture loops (they're
-          tied to that specific DOM node), breaking both the preview and DatasetView's
-          "capture from live feed" until a manual reconnect. */}
+          tied to that specific DOM node), breaking the preview, DatasetView's "capture from
+          live feed", and LiveTrackingView's frame sampling until a manual reconnect. */}
       <div hidden={tab !== "capture"}>
         <CaptureView capture={capture} />
       </div>
       <div hidden={tab !== "dataset"}>
         <DatasetView videoRef={capture.videoRef} captureStatus={capture.status} />
+      </div>
+      <div hidden={tab !== "live"}>
+        <LiveTrackingView videoRef={capture.videoRef} captureConnected={capture.status === "CONNECTED"} />
       </div>
     </div>
   );

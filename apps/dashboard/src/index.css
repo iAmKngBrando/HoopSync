@@ -23,10 +23,23 @@
   --warning: #facc15;
   --border: rgba(255, 255, 255, 0.08);
   --border-soft: rgba(255, 255, 255, 0.05);
+  --border-muted: rgba(255, 255, 255, 0.05);
   --border-primary: rgba(239, 59, 59, 0.35);
   --border-blue: rgba(59, 130, 246, 0.3);
   --ring: #ef3b3b;
   --ring-offset: #0a0d15;
+
+  /* Aliases so ported OT Analytics code (originally red/blue "destructive" vs.
+     purple "secondary"/"magenta") maps onto HoopSync's two-tone red/blue
+     palette without per-usage edits: destructive -> primary (red = loss,
+     same as red = my team elsewhere), secondary/magenta -> accent-blue
+     (opponent = blue everywhere in HoopSync). */
+  --destructive: var(--primary);
+  --destructive-hover: var(--primary-hover);
+  --secondary: var(--accent-blue);
+  --secondary-hover: var(--accent-blue-hover);
+  --magenta: var(--accent-blue);
+  --magenta-hover: var(--accent-blue-hover);
 }
 
 @theme inline {
@@ -51,8 +64,15 @@
   --color-border-soft: var(--border-soft);
   --color-border-primary: var(--border-primary);
   --color-border-blue: var(--border-blue);
+  --color-border-muted: var(--border-muted);
   --color-ring: var(--ring);
   --color-ring-offset: var(--ring-offset);
+  --color-destructive: var(--destructive);
+  --color-destructive-hover: var(--destructive-hover);
+  --color-secondary: var(--secondary);
+  --color-secondary-hover: var(--secondary-hover);
+  --color-magenta: var(--magenta);
+  --color-magenta-hover: var(--magenta-hover);
 
   --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial,
     sans-serif;
@@ -160,6 +180,51 @@
   .noise-dots {
     background-image: radial-gradient(rgba(255, 255, 255, 0.5) 1px, transparent 1px);
     background-size: 14px 14px;
+  }
+
+  /* Placeholder scenes for OT Analytics frames without a captured image yet. */
+  .scene {
+    background:
+      radial-gradient(55% 85% at 20% 40%, rgba(59, 130, 246, 0.4), transparent 70%),
+      radial-gradient(40% 70% at 34% 20%, rgba(239, 59, 59, 0.2), transparent 70%),
+      radial-gradient(55% 80% at 82% 35%, rgba(239, 59, 59, 0.28), transparent 70%),
+      linear-gradient(180deg, #0c1436 0%, #1a0c14 58%, #070b1a 100%);
+  }
+
+  .scene-court {
+    background:
+      radial-gradient(70% 55% at 50% 105%, rgba(255, 150, 60, 0.35), transparent 70%),
+      radial-gradient(45% 60% at 12% 30%, rgba(59, 130, 246, 0.26), transparent 70%),
+      radial-gradient(45% 60% at 88% 30%, rgba(239, 59, 59, 0.26), transparent 70%),
+      linear-gradient(180deg, #0b1230 0%, #1c1210 60%, #190c10 100%);
+  }
+
+  .scene-hatch {
+    background-image: repeating-linear-gradient(
+      135deg,
+      rgba(255, 255, 255, 0.03) 0 1px,
+      transparent 1px 9px
+    );
+  }
+
+  .plate {
+    background: linear-gradient(180deg, rgba(9, 16, 40, 0.86), rgba(6, 12, 30, 0.9));
+    border: 1px solid rgba(59, 130, 246, 0.4);
+    box-shadow: 0 0 24px -8px rgba(59, 130, 246, 0.5);
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+  }
+
+  .vs-mark {
+    font-family: var(--font-display);
+    font-style: italic;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    line-height: 1;
+    color: #fff;
+    text-shadow:
+      0 0 18px rgba(239, 59, 59, 0.55),
+      0 2px 0 rgba(0, 0, 0, 0.45);
   }
 }
 

@@ -1588,3 +1588,70 @@ The event-relay server and the Next.js dashboard/API can start as two small serv
 ## TruePlayer Rating and CourtIQ — schema implication
 
 Both concepts already appear in Sections 4-5 above (CourtIQ as the historical analytics hub, TruePlayer Rating as the proprietary player-quality metric) and now also in navigation (Section 24). Per Section 5's existing guidance, do not attempt to compute TruePlayer Rating in the first milestone — but Section 26's database design should explicitly reserve room for its likely future inputs so the historical data doesn't need backfilling later: per-game advanced stats (plus/minus, FG/3P/FT efficiency already listed), opponent strength/record at time of game, MyPlayer build metadata, and game-type context. This is a specific instance of Section 26's existing "preserves enough information" principle, called out here because TruePlayer Rating is now a named, committed feature rather than a placeholder idea.
+
+---
+
+# 34b. Decisions & Additions (2kOT merge)
+
+`~/Projects/2kOpTracker` ("2kOT") — built independently of this brief — turned out to already
+implement almost exactly what Section 20 (Server), Sections 26-28 (DB design, identity
+resolution, historical opponent resolution) and Phases 9-10 (Historical Data, Analytics) called
+for: a calibrated OpenCV/RapidOCR vision pipeline, a confirmation/voting session tracker, fuzzy
+opponent identity matching, a FastAPI REST API and SQLite storage, all tested against real
+recorded gameplay. Rather than build that layer from scratch per `§34a`'s Next.js/Prisma plan,
+it was forklifted into HoopSync wholesale. This section records that decision and what it
+superseded, so this brief stays the source of truth.
+
+## Decisions made
+
+**Section 20's server is now 2kOT's server, not a from-scratch Next.js/Prisma build.**
+`2kOpTracker/2kot-server` was copied as-is into `apps/server` (Python/FastAPI/OpenCV/RapidOCR/
+SQLite), keeping its internal `twokot` package name and `TWOKOT_*` env vars/`~/.2kot` data
+directory unchanged — a relocation, not a rewrite. It is the single processing pipeline for
+HoopSync now: both `apps/dashboard`'s **OT Analytics** tab and the **Live Dashboard**'s
+idle/opponent-tracking view read from it over the same `/api` it already exposed to 2kOT's own
+dashboard (see `SYSTEM_ARCHITECTURE.md` in that repo for the full pipeline design — screen
+classification/extraction, session state machine, opponent matching).
+
+**`apps/capture`'s own TS/tesseract.js detection+parsing pipeline (`src/detection/`,
+`src/parsing/`) was retired**, not kept in parallel — `apps/server`'s pipeline is more mature
+(confirmation/voting, fuzzy opponent matching, a layout-independent stats-table reader, real
+test fixtures). `apps/capture` keeps its Electron-native recording/tagging/dataset-saving shell
+(`main/sessionRecording.ts`, `main/tags.ts`, `main/dataset.ts`) — more capable than 2kOT's own
+browser-based frame-capture tool — and gained a new **Live Tracking** tab
+(`src/renderer/src/LiveTrackingView.tsx` + `capture/liveTracking.ts`) that streams frames to
+`apps/server`'s `POST /api/frames/analyze`, mirroring `2kot-frame-capture`'s live mode.
+
+**OT Analytics = Phases 9-10, forklifted rather than built fresh.** 2kOT's opponent-tracking UI
+(`2kot-app/src/components/{OpponentList,OpponentQuickStats,GameHistoryTable,QuickStatsCard,
+StatMetricCard,AddOpponentDialog,LogGameDialog,GameDetailDialog}.tsx` and their `ui/` atoms) now
+lives at `apps/dashboard/src/features/ot-analytics/` and `features/tracker-data/` (the shared
+API client, types, mapping and polling hook — `features/tracker-data/useTrackerData.ts` — both
+OT Analytics and the Live Dashboard's idle view read from it), restyled from 2kOT's cyan/purple
+theme to HoopSync's red/blue one via CSS token aliases in `index.css` (`--destructive` →
+`--primary`, `--secondary`/`--magenta` → `--accent-blue`) rather than per-component edits, so the
+ported files stay close to their 2kOT originals.
+
+**The Live Dashboard is state-driven, not a single fixed layout.** `apps/server`'s session
+tracker can only ever report a single you-vs-opponent session today (2kOT's existing scope) — it
+has no concept of teammates, so it cannot drive the mocked 5v5 squad box score built in the
+previous session. The Live Dashboard (`LiveDashboardRouter.tsx`) defaults to the real,
+server-backed opponent-tracking view (`features/live-session/LiveSessionView.tsx`, forklifted
+from 2kOT's `CurrentGameCard`/`MatchupPreviewCard`/`EndGameResultCard`/`RecentOpponentsList`) and
+keeps the earlier squad scoreboard reachable behind an explicit, clearly-labeled "Squad Preview"
+toggle — sample data only, since no detector reports teammates yet. Once squad detection is
+built this becomes a real phase branch instead of a manual toggle.
+
+## Deferred / Future To-Dos
+
+- **2v2/3v3/5v5 squad detection + multi-client Server Synchronization (Phase 6).** Needed before
+  the squad scoreboard can show real data instead of the sample preview — new vision work
+  (teammate stats aren't read by anything today) plus the multi-client session merge Phase 6
+  already specified.
+- **Migrate `apps/dashboard` to Electron**, matching `apps/capture`, to get away from the
+  browser — only if it doesn't dramatically complicate the dashboard's architecture. Not started.
+- **`~/Projects/2kOpTracker`'s own fate** (archive vs. keep developing standalone) — left
+  undecided; revisit once the forklift is verified working in practice, not just in a first pass.
+- **Cosmetic renames**: the `twokot` Python package, `~/.2kot` data directory and `TWOKOT_*` env
+  vars could become HoopSync-branded names once nothing depends on the 2kOT-era names anymore.
+  Not done now to keep the initial move low-risk.

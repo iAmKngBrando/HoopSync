@@ -11,6 +11,7 @@
     "build:capture": "pnpm --filter @hoopsync/capture build",
     "dev:dashboard": "pnpm --filter @hoopsync/dashboard dev",
     "build:dashboard": "pnpm --filter @hoopsync/dashboard build",
+    "dev:server": "cd apps/server && uv run python -m twokot",
     "typecheck": "pnpm -r typecheck",
     "test": "pnpm -r test"
   }

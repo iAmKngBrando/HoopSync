@@ -1,9 +1,10 @@
 import { useState } from 'react';
-import { Gamepad2, LayoutGrid, LineChart, Settings, Trophy, Users, Video } from 'lucide-react';
+import { Gamepad2, LayoutGrid, Settings, Trophy, Users, Video } from 'lucide-react';
 import { AppShell } from './components/AppShell';
-import { DashboardView } from './components/DashboardView';
+import { LiveDashboardRouter } from './components/LiveDashboardRouter';
 import { MinimalDashboard } from './components/MinimalDashboard';
 import { PlaceholderView } from './components/PlaceholderView';
+import { OtAnalyticsView } from './features/ot-analytics/OtAnalyticsView';
 import type { NavKey, ViewMode } from './types';
 
 const placeholders: Partial<Record<NavKey, { icon: typeof Gamepad2; title: string; description: string }>> = {
@@ -12,11 +13,6 @@ const placeholders: Partial<Record<NavKey, { icon: typeof Gamepad2; title: strin
   leaderboards: { icon: Trophy, title: 'Leaderboards', description: 'Season leaderboards are coming soon.' },
   teamStats: { icon: LayoutGrid, title: 'Team Stats', description: 'Aggregated team stats are coming soon.' },
   clips: { icon: Video, title: 'Clips', description: 'Your saved clip library is coming soon.' },
-  otAnalytics: {
-    icon: LineChart,
-    title: 'OT Analytics',
-    description: 'Reserved for the 2K OT Tracker analytics port — head-to-head records, opponent scouting, and TruePlayer Rating history will live here.',
-  },
   settings: { icon: Settings, title: 'Settings', description: 'Capture and account settings are coming soon.' },
 };
 
@@ -33,7 +29,9 @@ function App() {
   return (
     <AppShell active={active} onSelect={setActive} viewMode={viewMode} onViewModeChange={setViewMode}>
       {active === 'live' ? (
-        <DashboardView />
+        <LiveDashboardRouter />
+      ) : active === 'otAnalytics' ? (
+        <OtAnalyticsView />
       ) : placeholder ? (
         <PlaceholderView icon={placeholder.icon} title={placeholder.title} description={placeholder.description} />
       ) : null}

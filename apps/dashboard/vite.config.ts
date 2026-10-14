@@ -6,5 +6,9 @@ export default defineConfig({
   server: {
     port: 5190,
     strictPort: true,
+    // apps/server (the ported 2kOT API); see src/features/tracker-data/api.ts.
+    proxy: {
+      '/api': 'http://127.0.0.1:8787',
+    },
   },
 });
