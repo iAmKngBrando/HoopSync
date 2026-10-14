@@ -20,3 +20,16 @@ export function formatOverallAndBuild(overall?: number, build?: string, level?: 
     .filter(Boolean)
     .join(' | ');
 }
+
+export function formatRelativeTime(iso: string | null | undefined): string {
+  if (!iso) return 'No frames yet';
+  const ms = Date.now() - new Date(iso).getTime();
+  if (!Number.isFinite(ms) || ms < 0) return 'Just now';
+  const seconds = Math.round(ms / 1000);
+  if (seconds < 2) return 'Just now';
+  if (seconds < 60) return `${seconds}s ago`;
+  const minutes = Math.round(seconds / 60);
+  if (minutes < 60) return `${minutes}m ago`;
+  const hours = Math.round(minutes / 60);
+  return `${hours}h ago`;
+}

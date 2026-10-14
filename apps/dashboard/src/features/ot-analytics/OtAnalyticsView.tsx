@@ -2,7 +2,8 @@ import { useMemo, useState } from 'react';
 import { ServerOff, X } from 'lucide-react';
 import { api } from '../tracker-data/api';
 import type { NewGameResult } from '../tracker-data/api';
-import { messageOf, useTrackerData } from '../tracker-data/useTrackerData';
+import { messageOf } from '../tracker-data/useTrackerData';
+import { useTrackerDataContext } from '../tracker-data/TrackerDataContext';
 import { toOpponentSummary } from '../tracker-data/mapping';
 import { formatStreak } from '../tracker-data/format';
 import type { Game, GameStats } from '../tracker-data/types';
@@ -17,7 +18,7 @@ import { LogGameDialog } from './LogGameDialog';
 import { GameDetailDialog } from './GameDetailDialog';
 
 export function OtAnalyticsView() {
-  const { opponents, games, dashboard, connection, online, refresh } = useTrackerData();
+  const { opponents, games, dashboard, connection, online, refresh } = useTrackerDataContext();
   const [notice, setNotice] = useState<string | null>(null);
   const [showAddOpponent, setShowAddOpponent] = useState(false);
   const [showLogGame, setShowLogGame] = useState(false);

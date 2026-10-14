@@ -5,6 +5,7 @@ import { LiveDashboardRouter } from './components/LiveDashboardRouter';
 import { MinimalDashboard } from './components/MinimalDashboard';
 import { PlaceholderView } from './components/PlaceholderView';
 import { OtAnalyticsView } from './features/ot-analytics/OtAnalyticsView';
+import { TrackerDataProvider } from './features/tracker-data/TrackerDataContext';
 import type { NavKey, ViewMode } from './types';
 
 const placeholders: Partial<Record<NavKey, { icon: typeof Gamepad2; title: string; description: string }>> = {
@@ -27,15 +28,17 @@ function App() {
   const placeholder = placeholders[active];
 
   return (
-    <AppShell active={active} onSelect={setActive} viewMode={viewMode} onViewModeChange={setViewMode}>
-      {active === 'live' ? (
-        <LiveDashboardRouter />
-      ) : active === 'otAnalytics' ? (
-        <OtAnalyticsView />
-      ) : placeholder ? (
-        <PlaceholderView icon={placeholder.icon} title={placeholder.title} description={placeholder.description} />
-      ) : null}
-    </AppShell>
+    <TrackerDataProvider>
+      <AppShell active={active} onSelect={setActive} viewMode={viewMode} onViewModeChange={setViewMode}>
+        {active === 'live' ? (
+          <LiveDashboardRouter />
+        ) : active === 'otAnalytics' ? (
+          <OtAnalyticsView />
+        ) : placeholder ? (
+          <PlaceholderView icon={placeholder.icon} title={placeholder.title} description={placeholder.description} />
+        ) : null}
+      </AppShell>
+    </TrackerDataProvider>
   );
 }
 

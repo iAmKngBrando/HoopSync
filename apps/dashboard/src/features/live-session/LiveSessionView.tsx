@@ -9,7 +9,7 @@
 // Live Scoreboard, Session History and Connected Friends take their place,
 // brought back from the original squad dashboard.
 
-import { useTrackerData } from '../tracker-data/useTrackerData';
+import { useTrackerDataContext } from '../tracker-data/TrackerDataContext';
 import { CurrentGameCard } from './CurrentGameCard';
 import { MatchupPreviewCard } from './MatchupPreviewCard';
 import { EndGameResultCard } from './EndGameResultCard';
@@ -22,7 +22,7 @@ import { sessionHistory, connectedFriends } from '../../data/mockData';
 import { ServerOff } from 'lucide-react';
 
 export function LiveSessionView() {
-  const { dashboard, connection } = useTrackerData();
+  const { dashboard, connection } = useTrackerDataContext();
 
   if (connection === 'offline') {
     return (
