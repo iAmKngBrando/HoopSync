@@ -17,7 +17,7 @@ describe("tags", () => {
 
   it("seeds the default taxonomy on first read", async () => {
     const tags = await listTags(baseDir);
-    expect(tags.map((t) => t.name)).toContain("GAME_SCOREBOARD");
+    expect(tags.map((t) => t.name)).toContain("in_game");
     expect(tags.every((t) => t.builtin)).toBe(true);
   });
 
@@ -37,8 +37,8 @@ describe("tags", () => {
   });
 
   it("updates a tag's description", async () => {
-    const tags = await updateTagDescription(baseDir, "UNKNOWN", "Updated note.");
-    expect(tags.find((t) => t.name === "UNKNOWN")?.description).toBe("Updated note.");
+    const tags = await updateTagDescription(baseDir, "other", "Updated note.");
+    expect(tags.find((t) => t.name === "other")?.description).toBe("Updated note.");
   });
 
   it("persists across separate listTags calls", async () => {

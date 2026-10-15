@@ -1,57 +1,42 @@
 [
   {
-    "name": "GAME_SCOREBOARD",
-    "description": "Score, quarter, and game clock overlay.",
+    "name": "my_player_load_screen",
+    "description": "Your MyPlayer card during pre-game load-in (name, overall, level, build).",
     "builtin": true
   },
   {
-    "name": "PLAYER_STATS",
-    "description": "A single player's full stat line screen.",
+    "name": "opponent_player_load_screen",
+    "description": "Opponent's MyPlayer card during pre-game load-in.",
     "builtin": true
   },
   {
-    "name": "TEAM_STATS",
-    "description": "Full team stat table / box score screen.",
+    "name": "player_matchup",
+    "description": "Pre-game \"PLAYER MATCHUP\" screen comparing you and your opponent.",
     "builtin": true
   },
   {
-    "name": "PLAYER_BOX",
-    "description": "Small corner player stat box shown during live play.",
+    "name": "in_game",
+    "description": "Live gameplay - the persistent scoreboard (and shot-meter box) are on screen and readable.",
     "builtin": true
   },
   {
-    "name": "GAME_LOADING_SCREEN",
-    "description": "Loading or pre-game info screen.",
+    "name": "game_result",
+    "description": "Post-game \"YOU WON\" / \"YOU LOST\" banner screen.",
     "builtin": true
   },
   {
-    "name": "GAME_RESULT",
-    "description": "Post-game result / summary screen.",
+    "name": "winners_circle",
+    "description": "\"WINNERS CIRCLE\" screen shown after a win.",
     "builtin": true
   },
   {
-    "name": "GAME_START",
-    "description": "Screen shown as a game begins.",
+    "name": "final_game_stats",
+    "description": "Full \"GAME STATS\" table - can appear mid-game (stats button) or post-game, always the latest totals.",
     "builtin": true
   },
   {
-    "name": "GAME_END",
-    "description": "Screen shown as a game ends.",
-    "builtin": true
-  },
-  {
-    "name": "PLAYER_BUILD_INFO",
-    "description": "MyPlayer build/archetype info screen.",
-    "builtin": true
-  },
-  {
-    "name": "MENU_OR_FREE_ROAM",
-    "description": "Menus, lobby, MyPark/free-roam - not an active game.",
-    "builtin": true
-  },
-  {
-    "name": "UNKNOWN",
-    "description": "Doesn't clearly match any known screen type yet.",
+    "name": "other",
+    "description": "Doesn't match any known screen - menus, loading, free-roam/park, etc.",
     "builtin": true
   }
 ]

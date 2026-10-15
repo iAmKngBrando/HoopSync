@@ -11,27 +11,54 @@ export interface ScreenTag {
 }
 
 /**
- * Seed taxonomy from the product brief (Section 8), plus MENU_OR_FREE_ROAM - added so the
- * is_game_live detector (Section 9) has a labelable negative case distinct from the
- * generic UNKNOWN catch-all. Descriptions are intentionally generic/brief-sourced, not
- * guesses at actual NBA 2K26 UI specifics - refine them once real screens have been seen.
+ * Mirrors ScreenKind in apps/server/src/twokot/session.py ("Values match the capture
+ * tool's labels" - this is that match). apps/server's screens.py is the thing actually
+ * being trained/recalibrated, so labeling with anything else just produces data nobody
+ * can use - these are the exact categories classify() sorts a frame into. Names are
+ * ScreenKind's own string values (lowercase, not HoopSync's older SCREAMING_CASE style)
+ * so a labeled dataset can be compared directly against fixture expected.json files.
  */
 const DEFAULT_TAGS: ScreenTag[] = [
-  { name: "GAME_SCOREBOARD", description: "Score, quarter, and game clock overlay.", builtin: true },
-  { name: "PLAYER_STATS", description: "A single player's full stat line screen.", builtin: true },
-  { name: "TEAM_STATS", description: "Full team stat table / box score screen.", builtin: true },
-  { name: "PLAYER_BOX", description: "Small corner player stat box shown during live play.", builtin: true },
-  { name: "GAME_LOADING_SCREEN", description: "Loading or pre-game info screen.", builtin: true },
-  { name: "GAME_RESULT", description: "Post-game result / summary screen.", builtin: true },
-  { name: "GAME_START", description: "Screen shown as a game begins.", builtin: true },
-  { name: "GAME_END", description: "Screen shown as a game ends.", builtin: true },
-  { name: "PLAYER_BUILD_INFO", description: "MyPlayer build/archetype info screen.", builtin: true },
   {
-    name: "MENU_OR_FREE_ROAM",
-    description: "Menus, lobby, MyPark/free-roam - not an active game.",
+    name: "my_player_load_screen",
+    description: "Your MyPlayer card during pre-game load-in (name, overall, level, build).",
     builtin: true,
   },
-  { name: "UNKNOWN", description: "Doesn't clearly match any known screen type yet.", builtin: true },
+  {
+    name: "opponent_player_load_screen",
+    description: "Opponent's MyPlayer card during pre-game load-in.",
+    builtin: true,
+  },
+  {
+    name: "player_matchup",
+    description: "Pre-game \"PLAYER MATCHUP\" screen comparing you and your opponent.",
+    builtin: true,
+  },
+  {
+    name: "in_game",
+    description: "Live gameplay - the persistent scoreboard (and shot-meter box) are on screen and readable.",
+    builtin: true,
+  },
+  {
+    name: "game_result",
+    description: "Post-game \"YOU WON\" / \"YOU LOST\" banner screen.",
+    builtin: true,
+  },
+  {
+    name: "winners_circle",
+    description: "\"WINNERS CIRCLE\" screen shown after a win.",
+    builtin: true,
+  },
+  {
+    name: "final_game_stats",
+    description: "Full \"GAME STATS\" table - can appear mid-game (stats button) or post-game, always the latest totals.",
+    builtin: true,
+  },
+  {
+    name: "other",
+    description: "Doesn't match any known screen - menus, loading, free-roam/park, etc.",
+    builtin: true,
+  },
 ];
 
 function tagsPath(baseDir: string): string {

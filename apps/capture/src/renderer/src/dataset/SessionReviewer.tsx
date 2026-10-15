@@ -14,7 +14,7 @@ export function SessionReviewer({ tags, onCreateTag, activeSessionId }: SessionR
   const [selectedSessionId, setSelectedSessionId] = useState<string | null>(null);
   const [frames, setFrames] = useState<SessionFrame[]>([]);
   const [selectedFrameIds, setSelectedFrameIds] = useState<Set<string>>(new Set());
-  const [labelType, setLabelType] = useState("UNKNOWN");
+  const [labelType, setLabelType] = useState("other");
   const [loading, setLoading] = useState(false);
 
   const refreshSessions = useCallback(async () => {

@@ -18,7 +18,7 @@ interface ReviewCardProps {
 }
 
 export function ReviewCard({ pending, tags, onCreateTag, onSave, onDiscard }: ReviewCardProps) {
-  const [screenType, setScreenType] = useState<ScreenType>("UNKNOWN");
+  const [screenType, setScreenType] = useState<ScreenType>("other");
 
   return (
     <section className="panel panel--review">
