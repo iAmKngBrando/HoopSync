@@ -258,6 +258,13 @@ class SessionTracker:
         elif obs.kind == ScreenKind.IN_GAME:
             if just_confirmed and self.phase == Phase.PREGAME:
                 self.phase = Phase.IN_PROGRESS
+            elif just_confirmed and self.phase == Phase.IDLE:
+                # Pregame screens were missed - tracking probably started mid-game
+                # (a dropped connection, or just started late). Track the game
+                # anyway: opponent identity/build won't be known, but the live
+                # score will be, which matters more than sitting at idle all game.
+                self._game = _Game()
+                self.phase = Phase.IN_PROGRESS
             if self.phase == Phase.IN_PROGRESS and not self._game.end_screen_seen:
                 self._absorb_scoreboard(obs)
 

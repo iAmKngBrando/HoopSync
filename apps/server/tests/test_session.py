@@ -115,6 +115,33 @@ def test_scoreboard_hidden_by_an_overlay_does_not_end_the_game():
     assert tracker.phase == Phase.IN_PROGRESS
 
 
+def test_in_game_without_pregame_still_leaves_idle():
+    """Tracking starting mid-game (a dropped connection, started late) shouldn't
+    leave the dashboard stuck showing idle for the whole match."""
+    tracker = SessionTracker()
+    feed(tracker, IN_GAME)
+    assert tracker.phase == Phase.IN_PROGRESS
+    # Which side is "you" is only known from a pregame/matchup screen, so the
+    # live score can't be attributed yet - this only gets the phase right.
+    assert tracker.state["your_score"] is None
+    assert tracker.state["opponent_name"] is None
+
+    feed(tracker, LOST)
+    assert feed(tracker, STATS, times=6) == [], "no opponent name was ever read, so nothing is recorded"
+    assert tracker.phase == Phase.ENDED
+
+
+def test_next_game_after_a_missed_pregame_is_tracked_normally():
+    tracker = SessionTracker()
+    feed(tracker, IN_GAME)
+    assert tracker.phase == Phase.IN_PROGRESS
+    feed(tracker, MY_CARD)
+    assert tracker.phase == Phase.PREGAME
+    play_to_tipoff(tracker)
+    assert tracker.phase == Phase.IN_PROGRESS
+    assert tracker.state["opponent_name"] == "DntDaggMe"
+
+
 def test_you_on_the_right_of_the_matchup_screen_is_handled():
     tracker = SessionTracker()
     feed(tracker, MY_CARD)
