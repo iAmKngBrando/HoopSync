@@ -13,6 +13,7 @@
     "dev:dashboard:browser": "pnpm --filter @hoopsync/dashboard dev:browser",
     "build:dashboard": "pnpm --filter @hoopsync/dashboard build",
     "dev:server": "cd apps/server && uv run python -m twokot",
+    "dev:friends-server": "pnpm --filter @hoopsync/friends-server dev",
     "typecheck": "pnpm -r typecheck",
     "test": "pnpm -r test"
   }

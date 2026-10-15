@@ -10,6 +10,7 @@
 // brought back from the original squad dashboard.
 
 import { useTrackerDataContext } from '../tracker-data/TrackerDataContext';
+import { useFriendsRoster } from '../friends/useFriendsRoster';
 import { CurrentGameCard } from './CurrentGameCard';
 import { MatchupPreviewCard } from './MatchupPreviewCard';
 import { EndGameResultCard } from './EndGameResultCard';
@@ -17,12 +18,14 @@ import { OpponentQuickStats } from '../ot-analytics/OpponentQuickStats';
 import { LiveScoreboard } from '../../components/LiveScoreboard';
 import { SessionHistoryPanel } from '../../components/SessionHistoryPanel';
 import { ConnectedFriendsPanel } from '../../components/ConnectedFriendsPanel';
+import { PlayerStatCards } from '../../components/PlayerStatCards';
 import { Card, SectionHeader } from '../../components/ui/Card';
-import { sessionHistory, connectedFriends } from '../../data/mockData';
+import { sessionHistory, connectedFriends as sampleConnectedFriends } from '../../data/mockData';
 import { ServerOff } from 'lucide-react';
 
 export function LiveSessionView() {
   const { dashboard, connection } = useTrackerDataContext();
+  const friends = useFriendsRoster();
 
   if (connection === 'offline') {
     return (
@@ -51,6 +54,8 @@ export function LiveSessionView() {
         </div>
       )}
 
+      {friends.enabled && friends.players.length > 0 && <PlayerStatCards players={friends.players} />}
+
       <div className="grid grid-cols-1 gap-4 xl:grid-cols-12">
         <CurrentGameCard game={game} className="xl:col-span-8" />
         <OpponentQuickStats opponent={dashboard.focusOpponent} className="xl:col-span-4" />
@@ -69,7 +74,10 @@ export function LiveSessionView() {
         <MatchupPreviewCard matchup={dashboard.nextMatchup} className="xl:col-span-6" />
 
         <SessionHistoryPanel sessions={sessionHistory} className="xl:col-span-8" />
-        <ConnectedFriendsPanel friends={connectedFriends} className="xl:col-span-4" />
+        <ConnectedFriendsPanel
+          friends={friends.enabled ? friends.connectedFriends : sampleConnectedFriends}
+          className="xl:col-span-4"
+        />
       </div>
     </div>
   );

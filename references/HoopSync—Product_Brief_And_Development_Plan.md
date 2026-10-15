@@ -1690,3 +1690,42 @@ built this becomes a real phase branch instead of a manual toggle.
     launcher should probably open just the dashboard, with the capture app started separately
     (`pnpm dev:capture`) only when actually doing calibration work. Fine to keep launching both
     together while still mid-development; not changed now.
+
+## Friends relay (adapted from forza)
+
+`~/Projects/forza/apps/friends-server` + `packages/friends-protocol` turned out to be a direct
+template for the "Connected Friends" / multi-client piece Section 20 and Phase 6 (Server
+Synchronization) always called for: a small, stateless WebSocket relay grouping connections into
+named sessions, with a pure-function session manager (fully unit-tested, no sockets) and a thin
+`ws` server for the actual broadcasting. Ported as `apps/friends-server` +
+`packages/friends-protocol`, with `PlayerState` carrying `pts/reb/ast/stl/blk/isLive` instead of
+forza's position/speed/lap telemetry, and `JOIN`/`UPDATE`/`GAME_RESULT` mirroring forza's
+`JOIN`/`UPDATE`/`RACE_RESULT`. Two deliberate departures from a literal port:
+
+- **Event-driven updates, not a 15Hz send loop.** Box-score stats change in discrete bursts, not
+  continuously, so `apps/dashboard`'s `FriendsClient.reportLocalState` only sends when the state
+  actually changed (plus a 20s heartbeat so a long steady stretch doesn't look stale to peers).
+- **`GAME_RESULT`/`FRIEND_GAME_RESULT`** (forza's `RACE_RESULT`/`FRIEND_RACE_RESULT`) is relayed
+  but not persisted anywhere on the receiving end — forza POSTs it to its own server for storage;
+  a friend's game isn't *your* opponent-tracking data, so for now it's just available for a
+  future toast/notification (not built yet).
+
+`apps/dashboard`'s `features/friends/` wires this into the UI: `PlayerStatCards` (the top-of-
+dashboard cards from `reference_image_main_dashboard_view`) and `ConnectedFriendsPanel` now read
+the real roster instead of `mockData.ts`'s hardcoded array, whenever Friends is enabled in
+Settings. **Host is user-configurable (`FriendsSettingsPanel`, persisted to localStorage) because
+the crew sometimes plays remotely** — local (`127.0.0.1`) by default for development, pointed at
+an AWS relay or a friend's LAN IP for real play. Since the relay host is only known at runtime,
+not build time, `apps/dashboard`'s CSP `connect-src` allows `ws:`/`wss:` broadly rather than
+naming a fixed host (the same class of bug as the capture app's original CSP gap — caught by
+testing this one more carefully).
+
+`apps/friends-server/scripts/simulate-friend.ts` (forza's `simulate-player.ts`, adapted) is the
+"fake friend" tool — connects as a real client and sends believable stat updates on a timer, for
+exercising the roster UI without a second person.
+
+**What's real vs. simulated right now:** only `pts` (mapped from `dashboard.currentGame.yourScore`,
+accurate in 1v1 mode) and `isLive` are genuinely known locally — `reb`/`ast`/`stl`/`blk` are always
+`0` from the real sender, since nothing reads live per-stat box score yet (only the final box
+score, once a game ends). The protocol already carries full stats for when that lands; until then,
+`simulate-friend.ts` is the only source of non-zero reb/ast/stl/blk, for UI testing.
