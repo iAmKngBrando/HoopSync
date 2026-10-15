@@ -1648,10 +1648,45 @@ built this becomes a real phase branch instead of a manual toggle.
   the squad scoreboard can show real data instead of the sample preview — new vision work
   (teammate stats aren't read by anything today) plus the multi-client session merge Phase 6
   already specified.
-- **Migrate `apps/dashboard` to Electron**, matching `apps/capture`, to get away from the
-  browser — only if it doesn't dramatically complicate the dashboard's architecture. Not started.
+- ~~**Migrate `apps/dashboard` to Electron**, matching `apps/capture`, to get away from the
+  browser.~~ **Done.** Safari's background-tab throttling was confirmed (via server logs) to be
+  dropping the Elgato connection a minute or two into a real game — the same problem `apps/capture`
+  was already Electron to avoid. The dashboard now shares that shell, the camera-permission
+  auto-grant, and absolute (not dev-proxy-relative) API URLs. A `vite.browser.config.ts` /
+  `pnpm dev:browser` mode is kept alongside purely so UI changes can still be screenshot-verified
+  without the Electron shell — not for real capture use. A quick (unsigned, unpackaged) desktop
+  launcher also exists now: `~/Desktop/HoopSync.app` just shells out to `hoopsync.sh` in a Terminal
+  window; it is not a real packaged build (see the next item).
 - **`~/Projects/2kOpTracker`'s own fate** (archive vs. keep developing standalone) — left
   undecided; revisit once the forklift is verified working in practice, not just in a first pass.
 - **Cosmetic renames**: the `twokot` Python package, `~/.2kot` data directory and `TWOKOT_*` env
   vars could become HoopSync-branded names once nothing depends on the 2kOT-era names anymore.
   Not done now to keep the initial move low-risk.
+- **Dev → "prod" transition**, raised once there was a desktop icon to actually click. Today dev
+  and real use are the same thing: one `~/.2kot` SQLite DB + `frames/` folder, with no separation
+  between opponents/games created while testing a feature and games from actually played matches.
+  Before leaning on this for real tracked stats, worth deciding:
+  - **Data location**: keep dev and "real" usage sharing one `~/.2kot` (simplest — this is a
+    single-user local app, not a multi-tenant one, so there may be no real need to split them), or
+    give feature-testing its own throwaway `TWOKOT_DATA_DIR` so it never touches real history.
+  - **Reset tooling**: an easy way to wipe accumulated test data (e.g. the opponents/games created
+    while testing live tracking this session) before it's treated as real — today that's manual
+    (`DELETE /opponents/{id}` cascades to their games, or just deleting `~/.2kot/2kot.db` +
+    `frames/` outright and letting the server recreate them).
+  - **`capture-samples/`/`session-recordings/` disk growth**: these accumulate unbounded (one
+    ~9-minute test session was 500MB+ at ~2fps) — fine for now, but worth a cleanup pass or a size
+    cap before this runs unattended for real sessions regularly.
+  - **Proper packaging blocker**: if `apps/capture` or `apps/dashboard` are ever built into a real
+    distributable `.app` (via `electron-builder`, not today's shell-wrapper launcher),
+    `apps/capture`'s dataset/session-recording dirs are currently relative to `app.getAppPath()`
+    (the repo checkout) specifically so a developer can browse them in Finder — that breaks in a
+    packaged build and would need to move to `app.getPath('userData')` (or similar) first.
+  - **Server logging**: `apps/server`'s default uvicorn access logs (every request, including the
+    5s dashboard poll) are useful for dev but noisy for something meant to just run in the
+    background — worth quieting down before "prod" use, not required now.
+  - **Desktop launcher scope**: `HoopSync.app`/`hoopsync.sh` currently open the dashboard *and*
+    the capture app together. `apps/capture` is a dev/calibration tool (recording, labelling,
+    live-tracking diagnostics) that day-to-day use of the dashboard doesn't need — eventually the
+    launcher should probably open just the dashboard, with the capture app started separately
+    (`pnpm dev:capture`) only when actually doing calibration work. Fine to keep launching both
+    together while still mid-development; not changed now.

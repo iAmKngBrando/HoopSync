@@ -7,31 +7,71 @@ analytics platform (CourtIQ), including a proprietary player-quality metric (Tru
 Rating) once enough historical data exists.
 
 See [`references/HoopSync—Product_Brief_And_Development_Plan.md`](references/HoopSync—Product_Brief_And_Development_Plan.md)
-for the full product brief, architecture decisions, and phased development plan. This
-README only covers running what currently exists.
+for the full product brief, architecture decisions, and phased development plan —
+including `§34a`/`§34b`, which record real decisions made as the project evolved (e.g.
+why `apps/server` ended up being the ported 2kOT server rather than the originally
+planned Next.js/Prisma build). This README only covers running what currently exists.
 
 ## Project layout
 
-- `apps/capture` — Electron desktop app (Phase 1): connects to the Elgato HD60 X capture
-  device, pulls live frames, maintains a rolling in-memory frame buffer, and surfaces
-  capture diagnostics. Cross-platform (Windows + Mac) via `getUserMedia`.
+- `apps/capture` — Electron desktop app: connects to the Elgato HD60 X capture device,
+  records/labels sample frames for calibration, and streams live frames to `apps/server`
+  for screen reading. Cross-platform (Windows + Mac) via `getUserMedia`.
+- `apps/server` — Python/FastAPI server (ported from `2kOT`): the screen-reading/OCR
+  pipeline (OpenCV + RapidOCR), session tracking, opponent matching, and SQLite storage.
+  The single processing backend both other apps talk to.
+- `apps/dashboard` — Electron desktop app: the live dashboard (squad box score preview),
+  OT Analytics (opponent records, game history), and its own Settings > Capture Device
+  panel for connecting the Elgato directly, without needing `apps/capture` open.
 - `references/` — product brief, development plan, and UI reference mockups.
-
-Planned but not yet started: `apps/server` (event-relay, adapted from
-`/Users/Brando/Projects/forza/apps/friends-server`) and `apps/dashboard` (Next.js live +
-historical dashboard, modeled on `/Users/Brando/Projects/GamedayBetTrackerr`) — see the
-brief's Section 34a for the reasoning.
+- `resources/`, `scripts/create-desktop-launcher.sh` — builds a quick, unsigned
+  `~/Desktop/HoopSync.app` launcher (see below). Not a packaged build of the apps
+  themselves.
 
 ## Development
 
-Requires Node 20+ and pnpm (`npx pnpm install` works without a global pnpm install).
+Requires Node 20+, pnpm (`npx pnpm install` works without a global pnpm install), and
+[uv](https://docs.astral.sh/uv/) for `apps/server`.
 
 ```bash
 npx pnpm install
-npx pnpm dev:capture
+cd apps/server && uv sync && cd ../..
 ```
 
-On first run, macOS/Windows will prompt for camera/capture permission for the Electron
-app — this is expected; the Elgato HD60 X shows up as a standard video-input device once
-Elgato's own capture software (Camera Hub / 4K Capture Utility) has its virtual camera
-output enabled.
+### Running everything
+
+```bash
+./hoopsync.sh               # server + dashboard + capture app, one terminal, Ctrl-C stops all
+./hoopsync.sh --no-capture  # skip the capture app
+./hoopsync_dev.sh           # same, but one Terminal window per part (separate logs)
+```
+
+### Running one piece at a time
+
+```bash
+npx pnpm dev:server      # apps/server, http://127.0.0.1:8787 (docs at /docs)
+npx pnpm dev:dashboard   # apps/dashboard, Electron window
+npx pnpm dev:capture     # apps/capture, Electron window
+```
+
+`npx pnpm dev:dashboard:browser` also exists — it serves the dashboard's UI as a plain
+browser page instead of Electron. That's for quickly checking UI/layout changes in a
+browser; it's not meant for real capture use (the whole reason both apps are Electron is
+that a backgrounded browser tab unreliably drops the Elgato connection a minute or two
+into a game — see `§34b`).
+
+On first run, macOS/Windows will prompt for camera/capture permission — this is expected;
+the Elgato HD60 X shows up as a standard video-input device once Elgato's own capture
+software (Camera Hub / 4K Capture Utility) has its virtual camera output enabled.
+
+### Desktop launcher
+
+```bash
+./scripts/create-desktop-launcher.sh
+```
+
+Builds `~/Desktop/HoopSync.app` — double-click it to open a Terminal window running
+`hoopsync.sh`. This is **not committed to git** (it's a per-machine, Desktop-specific
+artifact); re-run the script after cloning, or any time you want to rebuild it. It's a
+thin, unsigned wrapper, not a real packaged build of the apps — see the product brief's
+"Dev → prod transition" to-do for what that would need.
