@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { Camera, X } from 'lucide-react';
 import { cn } from '../../utils/cn';
 import { STAT_COLUMNS, type Game, type GameStats, type StatColumn, type StatRow } from '../tracker-data/types';
-import type { StatsPhotoResult } from '../tracker-data/api';
+import { toServerUrl, type StatsPhotoResult } from '../tracker-data/api';
 import { formatDate } from '../tracker-data/format';
 
 interface GameDetailDialogProps {
@@ -48,7 +48,7 @@ export function GameDetailDialog({
   onClose,
 }: GameDetailDialogProps) {
   const [draft, setDraft] = useState<Draft>(() => toDraft(game.stats));
-  const [photoUrl, setPhotoUrl] = useState(game.stats_photo_path ?? null);
+  const [photoUrl, setPhotoUrl] = useState(toServerUrl(game.stats_photo_path) ?? null);
   const [warnings, setWarnings] = useState<string[]>([]);
   const [notice, setNotice] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -85,7 +85,7 @@ export function GameDetailDialog({
         you: { ...current.you, ...read.you },
         opponent: { ...current.opponent, ...read.opponent },
       }));
-      setPhotoUrl(result.photo_url);
+      setPhotoUrl(toServerUrl(result.photo_url) ?? null);
       setWarnings(result.warnings);
       setDirty(found > 0);
       setNotice(
@@ -248,8 +248,8 @@ export function GameDetailDialog({
             <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
               {[
                 { url: photoUrl, label: 'Stats photo' },
-                { url: game.start_frame_path, label: 'Matchup screen' },
-                { url: game.end_frame_path, label: 'End of game' },
+                { url: toServerUrl(game.start_frame_path), label: 'Matchup screen' },
+                { url: toServerUrl(game.end_frame_path), label: 'End of game' },
               ]
                 .filter((frame) => frame.url)
                 .map((frame) => (

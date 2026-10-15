@@ -1,8 +1,19 @@
-// Client for apps/server (the ported 2kOT API). In development Vite proxies
-// /api to it (see vite.config.ts), so no host is hard-coded here. Forklifted
-// from 2kot-app/src/api/client.ts.
+// Client for apps/server (the ported 2kOT API). Uses an absolute URL rather
+// than relying on a dev-only proxy, matching apps/capture's liveTracking.ts -
+// this app runs as Electron now (see src/main/index.ts), where there's no
+// dev-server proxy to lean on once this is ever packaged. Forklifted from
+// 2kot-app/src/api/client.ts.
 
 import type { Game, GameStats, LiveState, Opponent, Statistics } from './types';
+
+export const SERVER_URL = 'http://127.0.0.1:8787';
+
+/** Prefixes a server-relative path (e.g. "/api/frames/3/image") with the server
+ * origin, so <img src> etc. resolve correctly without a dev proxy in the way. */
+export function toServerUrl(path?: string | null): string | undefined {
+  if (!path) return undefined;
+  return path.startsWith('http') ? path : `${SERVER_URL}${path}`;
+}
 
 export class ApiError extends Error {
   status: number;
@@ -17,7 +28,7 @@ export class ApiError extends Error {
 async function request<T>(path: string, init?: RequestInit): Promise<T> {
   let response: Response;
   try {
-    response = await fetch(`/api${path}`, {
+    response = await fetch(`${SERVER_URL}/api${path}`, {
       ...init,
       // FormData sets its own multipart content type.
       headers: typeof init?.body === 'string' ? { 'Content-Type': 'application/json' } : undefined,
@@ -27,7 +38,6 @@ async function request<T>(path: string, init?: RequestInit): Promise<T> {
   }
 
   if (!response.ok) {
-    // The dev proxy answers 5xx when the server itself is down.
     if (response.status >= 500) {
       throw new ApiError('The tracker service is not reachable', 0);
     }

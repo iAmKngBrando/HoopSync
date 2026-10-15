@@ -1,11 +1,9 @@
 import { useCallback, useEffect, useRef, useState, type RefObject } from "react";
+import { SERVER_URL } from "../tracker-data/api";
 
 // Mirrors apps/capture's capture/liveTracking.ts, so the dashboard can send
 // frames to apps/server on its own — the main app shouldn't need the
-// separate Electron capture app running just to go live. Uses a relative
-// path (the dev server proxies /api -> http://127.0.0.1:8787; see
-// vite.config.ts) rather than a hard-coded host, unlike the Electron app
-// which isn't served through that proxy.
+// separate Electron capture app running just to go live.
 const SAMPLE_RATE_HZ = 2;
 
 export type LiveTrackingStatus =
@@ -53,7 +51,7 @@ export function useLiveTracking(videoRef: RefObject<HTMLVideoElement>): LiveTrac
           const body = new FormData();
           body.append("file", blob, "frame.jpg");
           body.append("captured_at", new Date().toISOString());
-          const response = await fetch("/api/frames/analyze", { method: "POST", body });
+          const response = await fetch(`${SERVER_URL}/api/frames/analyze`, { method: "POST", body });
           if (!response.ok) throw new Error(`Server answered ${response.status}`);
           const result = await response.json();
           setFramesSent((n) => n + 1);

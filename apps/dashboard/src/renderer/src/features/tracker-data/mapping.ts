@@ -11,6 +11,7 @@ import type {
   OverallStats,
 } from './types';
 import { sampleDashboardData } from './sampleData';
+import { toServerUrl } from './api';
 
 function byNewest(a: Game, b: Game) {
   return new Date(b.date).getTime() - new Date(a.date).getTime();
@@ -90,7 +91,7 @@ export function toCurrentGame(live: LiveState | null): CurrentGame | null {
     yourScore: session.your_score ?? undefined,
     opponentScore: session.opponent_score ?? undefined,
     frame: session.start_frame_url
-      ? { imageUrl: session.start_frame_url, label: 'Matchup Screen' }
+      ? { imageUrl: toServerUrl(session.start_frame_url), label: 'Matchup Screen' }
       : undefined,
   };
 }
@@ -127,7 +128,7 @@ export function buildDashboardData(
               overall: latestOpponent.overall ?? undefined,
               build: latestOpponent.build ?? undefined,
             },
-            frame: { imageUrl: latestGame.start_frame_path ?? undefined, label: 'Matchup Screen' },
+            frame: { imageUrl: toServerUrl(latestGame.start_frame_path), label: 'Matchup Screen' },
           }
         : null,
     endGame: latestGame
@@ -135,7 +136,7 @@ export function buildDashboardData(
           outcome: latestGame.outcome,
           yourScore: latestGame.your_score,
           opponentScore: latestGame.opponent_score,
-          frame: { imageUrl: latestGame.end_frame_path ?? undefined, label: 'End Game Screen' },
+          frame: { imageUrl: toServerUrl(latestGame.end_frame_path), label: 'End Game Screen' },
         }
       : null,
     history: toHistoryRows(games, opponents),
