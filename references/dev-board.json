@@ -1,0 +1,75 @@
+[
+  {
+    "id": "seed-1",
+    "title": "Recalibrate vision pipeline for Proving Grounds / City Games 1v1",
+    "note": "Pipeline is calibrated for 1v1 Theater; the mode we actually play isn't detected at all. Use session-recordings/668fecdd... as reference frames.",
+    "column": "todo",
+    "tag": "core",
+    "createdAt": "2026-10-15T12:00:00.000Z"
+  },
+  {
+    "id": "seed-2",
+    "title": "Read live per-stat box score (reb/ast/stl/blk)",
+    "note": "Only pts + final score are real today - friends roster shows 0 for everything else.",
+    "column": "todo",
+    "tag": "core",
+    "createdAt": "2026-10-15T12:00:00.000Z"
+  },
+  {
+    "id": "seed-3",
+    "title": "Stand up the AWS friends-relay and test with a real second person",
+    "column": "todo",
+    "tag": "core",
+    "createdAt": "2026-10-15T12:00:00.000Z"
+  },
+  {
+    "id": "seed-4",
+    "title": "Build 2v2/3v3/5v5 squad detection + multi-client sync",
+    "note": "Needed before Squad Preview becomes real instead of sample data.",
+    "column": "todo",
+    "tag": "core",
+    "createdAt": "2026-10-15T12:00:00.000Z"
+  },
+  {
+    "id": "seed-5",
+    "title": "Remove remaining mock/sample data fallbacks",
+    "column": "todo",
+    "tag": "cleanup",
+    "createdAt": "2026-10-15T12:00:00.000Z"
+  },
+  {
+    "id": "seed-6",
+    "title": "Decide dev vs. real data split + add a reset tool",
+    "column": "todo",
+    "tag": "cleanup",
+    "createdAt": "2026-10-15T12:00:00.000Z"
+  },
+  {
+    "id": "seed-7",
+    "title": "Cap/clean up capture-samples and session-recordings disk usage",
+    "column": "todo",
+    "tag": "cleanup",
+    "createdAt": "2026-10-15T12:00:00.000Z"
+  },
+  {
+    "id": "seed-8",
+    "title": "Desktop launcher: open the dashboard only, capture app separately",
+    "column": "todo",
+    "tag": "cleanup",
+    "createdAt": "2026-10-15T12:00:00.000Z"
+  },
+  {
+    "id": "seed-9",
+    "title": "Friend game-result toast/notification",
+    "column": "todo",
+    "tag": "nice-to-have",
+    "createdAt": "2026-10-15T12:00:00.000Z"
+  },
+  {
+    "id": "seed-10",
+    "title": "Session replay/scrubber over recorded frames",
+    "column": "todo",
+    "tag": "nice-to-have",
+    "createdAt": "2026-10-15T12:00:00.000Z"
+  }
+]

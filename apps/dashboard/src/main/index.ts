@@ -1,7 +1,18 @@
 import { join } from "node:path";
 import { app, BrowserWindow, ipcMain, session, shell, systemPreferences } from "electron";
+import { addCard, deleteCard, listBoard, moveCard, type BoardColumn, type BoardTag } from "./devBoard";
 
 const CAMERA_PRIVACY_SETTINGS_URL = "x-apple.systempreferences:com.apple.preference.security?Privacy_Camera";
+
+/**
+ * references/dev-board.json, next to the product brief - checked into git so the lite
+ * kanban (Settings -> Developer) syncs between co-developers via normal git push/pull,
+ * same way the brief itself does. Dashboard's own app dir is apps/dashboard, two levels
+ * below the repo root.
+ */
+function devBoardPath(): string {
+  return join(app.getAppPath(), "..", "..", "references", "dev-board.json");
+}
 
 function createWindow(): void {
   const mainWindow = new BrowserWindow({
@@ -61,6 +72,15 @@ app.whenReady().then(() => {
   ipcMain.handle("camera:open-privacy-settings", () => {
     if (process.platform === "darwin") shell.openExternal(CAMERA_PRIVACY_SETTINGS_URL);
   });
+
+  ipcMain.handle("dev-board:list", () => listBoard(devBoardPath()));
+  ipcMain.handle(
+    "dev-board:add",
+    (_event, title: string, note: string | undefined, tag: BoardTag | undefined, author: string | undefined) =>
+      addCard(devBoardPath(), title, note, tag, author),
+  );
+  ipcMain.handle("dev-board:move", (_event, id: string, column: BoardColumn) => moveCard(devBoardPath(), id, column));
+  ipcMain.handle("dev-board:delete", (_event, id: string) => deleteCard(devBoardPath(), id));
 
   createWindow();
 

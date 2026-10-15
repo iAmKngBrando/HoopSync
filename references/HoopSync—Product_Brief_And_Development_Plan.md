@@ -1729,3 +1729,19 @@ accurate in 1v1 mode) and `isLive` are genuinely known locally — `reb`/`ast`/`
 `0` from the real sender, since nothing reads live per-stat box score yet (only the final box
 score, once a game ends). The protocol already carries full stats for when that lands; until then,
 `simulate-friend.ts` is the only source of non-zero reb/ast/stl/blk, for UI testing.
+
+## Dev board (lite kanban, dev-only)
+
+A co-developer who isn't deep into git shouldn't have to use GitHub Issues to see or add to-dos,
+but the to-do list still needs to live somewhere both people see after a `git pull` — so instead
+of an external tool, it's a tiny kanban built into the app itself: Settings → **Developer** tab
+(`apps/dashboard/src/renderer/src/features/dev-board/DevBoardPanel.tsx`), backed by
+`references/dev-board.json` next to this brief. The main process reads/writes that file
+(`apps/dashboard/src/main/devBoard.ts`, mirroring the `tags.ts` pure-functions-plus-thin-IPC
+pattern from `apps/capture`); the renderer just calls `window.hoopsync.devBoard`. Three columns
+(To Do/In Progress/Done), an optional tag (core/cleanup/nice-to-have) and author, move with
+←/→ — no drag-and-drop, this is meant to stay simple. Because it's a plain JSON file, it syncs
+exactly like any other change: add/move/delete a card, then commit and push
+`references/dev-board.json` same as any other file, and the other person sees it on their next
+pull. Not available in the plain-browser dev mode (no `window.hoopsync`) — Electron only.
+Explicitly temporary: pull the Developer tab (and this file) before a production build.
