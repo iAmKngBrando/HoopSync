@@ -3,6 +3,7 @@ import { app, BrowserWindow, ipcMain, session, shell, systemPreferences } from "
 import {
   deleteDatasetExample,
   listDatasetExamples,
+  renameScreenType,
   saveDatasetExample,
   saveDatasetExampleFromFile,
   type SaveDatasetExampleInput,
@@ -17,7 +18,7 @@ import {
   startSession,
   type AppendSessionFrameInput,
 } from "./sessionRecording";
-import { addTag, listTags, updateTagDescription } from "./tags";
+import { addTag, deleteTag, listTags, renameTag, updateTagDescription } from "./tags";
 
 const CAMERA_PRIVACY_SETTINGS_URL = "x-apple.systempreferences:com.apple.preference.security?Privacy_Camera";
 
@@ -105,6 +106,20 @@ app.whenReady().then(() => {
   ipcMain.handle("tags:update-description", (_event, name: string, description: string) =>
     updateTagDescription(tagsDir(), name, description),
   );
+  // Renaming a tag retargets the dataset too: the screenType dir + manifest entries
+  // follow the new name, otherwise the examples would stop showing in the gallery.
+  ipcMain.handle("tags:rename", async (_event, name: string, newName: string) => {
+    const next = await renameTag(tagsDir(), name, newName);
+    await renameScreenType(datasetDir(), name, newName.trim());
+    return next;
+  });
+  ipcMain.handle("tags:delete", async (_event, name: string) => {
+    const inUse = (await listDatasetExamples(datasetDir())).filter((e) => e.screenType === name).length;
+    if (inUse > 0) {
+      throw new Error(`"${name}" still labels ${inUse} dataset example(s) - delete those examples first`);
+    }
+    return deleteTag(tagsDir(), name);
+  });
 
   ipcMain.handle("session:start", () => startSession(sessionRecordingsDir()));
   ipcMain.handle("session:append-frame", (_event, sessionId: string, input: AppendSessionFrameInput) =>

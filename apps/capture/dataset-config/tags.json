@@ -38,5 +38,10 @@
     "name": "other",
     "description": "Doesn't match any known screen - menus, loading, free-roam/park, etc.",
     "builtin": true
+  },
+  {
+    "name": "proving_grounds_player_matchup",
+    "description": "Pre-game \"Proving Grounds PLAYER MATCHUP\" screen comparing you and your opponent.",
+    "builtin": false
   }
 ]

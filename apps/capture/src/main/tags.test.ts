@@ -2,7 +2,7 @@ import { mkdtemp, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
-import { addTag, listTags, updateTagDescription } from "./tags";
+import { addTag, deleteTag, listTags, renameTag, updateTagDescription } from "./tags";
 
 describe("tags", () => {
   let baseDir: string;
@@ -45,5 +45,28 @@ describe("tags", () => {
     await addTag(baseDir, "MY_TAG", "note");
     const tags = await listTags(baseDir);
     expect(tags.map((t) => t.name)).toContain("MY_TAG");
+  });
+
+  it("renames a custom tag", async () => {
+    await addTag(baseDir, "OLD_NAME", "note");
+    const tags = await renameTag(baseDir, "OLD_NAME", "NEW_NAME");
+    expect(tags.map((t) => t.name)).toContain("NEW_NAME");
+    expect(tags.find((t) => t.name === "NEW_NAME")?.description).toBe("note");
+  });
+
+  it("rejects renaming to an existing name case-insensitively", async () => {
+    await addTag(baseDir, "TAG_A", "");
+    await expect(renameTag(baseDir, "TAG_A", "in_game")).rejects.toThrow(/already exists/);
+  });
+
+  it("rejects renaming or deleting a built-in tag", async () => {
+    await expect(renameTag(baseDir, "in_game", "x")).rejects.toThrow(/built-in/);
+    await expect(deleteTag(baseDir, "in_game")).rejects.toThrow(/built-in/);
+  });
+
+  it("deletes a custom tag", async () => {
+    await addTag(baseDir, "SHORT_LIVED", "");
+    const tags = await deleteTag(baseDir, "SHORT_LIVED");
+    expect(tags.map((t) => t.name)).not.toContain("SHORT_LIVED");
   });
 });

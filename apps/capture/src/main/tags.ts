@@ -111,3 +111,33 @@ export async function updateTagDescription(
   await writeTags(baseDir, next);
   return next;
 }
+
+/** Renames a custom tag. The caller retargets existing dataset examples (see index.ts). */
+export async function renameTag(baseDir: string, name: string, newName: string): Promise<ScreenTag[]> {
+  const trimmed = newName.trim();
+  if (!trimmed) throw new Error("Tag name can't be empty");
+
+  const tags = await listTags(baseDir);
+  const tag = tags.find((t) => t.name === name);
+  if (!tag) throw new Error(`Unknown tag "${name}"`);
+  if (tag.builtin) throw new Error(`"${name}" is a built-in tag`);
+  if (tags.some((t) => t.name !== name && t.name.toLowerCase() === trimmed.toLowerCase())) {
+    throw new Error(`Tag "${trimmed}" already exists`);
+  }
+
+  const next = tags.map((t) => (t.name === name ? { ...t, name: trimmed } : t));
+  await writeTags(baseDir, next);
+  return next;
+}
+
+/** Deletes a custom tag. The caller refuses while dataset examples still use it. */
+export async function deleteTag(baseDir: string, name: string): Promise<ScreenTag[]> {
+  const tags = await listTags(baseDir);
+  const tag = tags.find((t) => t.name === name);
+  if (!tag) return tags;
+  if (tag.builtin) throw new Error(`"${name}" is a built-in tag`);
+
+  const next = tags.filter((t) => t.name !== name);
+  await writeTags(baseDir, next);
+  return next;
+}

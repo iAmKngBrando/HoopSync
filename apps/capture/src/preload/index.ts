@@ -26,6 +26,9 @@ contextBridge.exposeInMainWorld("hoopsync", {
   addTag: (name: string, description: string): Promise<ScreenTag[]> => ipcRenderer.invoke("tags:add", name, description),
   updateTagDescription: (name: string, description: string): Promise<ScreenTag[]> =>
     ipcRenderer.invoke("tags:update-description", name, description),
+  renameTag: (name: string, newName: string): Promise<ScreenTag[]> =>
+    ipcRenderer.invoke("tags:rename", name, newName),
+  deleteTag: (name: string): Promise<ScreenTag[]> => ipcRenderer.invoke("tags:delete", name),
 
   startSession: (): Promise<SessionSummary> => ipcRenderer.invoke("session:start"),
   appendSessionFrame: (sessionId: string, input: AppendSessionFrameInput): Promise<SessionFrame> =>

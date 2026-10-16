@@ -32,9 +32,19 @@ export function useTags() {
     setTags(await window.hoopsync.updateTagDescription(name, description));
   }, []);
 
+  const renameTag = useCallback(async (name: string, newName: string) => {
+    if (!window.hoopsync) return;
+    setTags(await window.hoopsync.renameTag(name, newName));
+  }, []);
+
+  const deleteTag = useCallback(async (name: string) => {
+    if (!window.hoopsync) return;
+    setTags(await window.hoopsync.deleteTag(name));
+  }, []);
+
   useEffect(() => {
     refresh();
   }, [refresh]);
 
-  return { tags, loading, error, addTag, updateDescription, refresh };
+  return { tags, loading, error, addTag, updateDescription, renameTag, deleteTag, refresh };
 }

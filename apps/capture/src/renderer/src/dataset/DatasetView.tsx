@@ -112,7 +112,15 @@ export function DatasetView({ videoRef, captureStatus }: DatasetViewProps) {
           <h2>Tags</h2>
           <button onClick={() => setShowTagManager((v) => !v)}>{showTagManager ? "Hide" : "Manage tags"}</button>
         </div>
-        {showTagManager && <TagManager tags={tagsState.tags} onUpdateDescription={tagsState.updateDescription} />}
+        {showTagManager && (
+          <TagManager
+            tags={tagsState.tags}
+            onUpdateDescription={tagsState.updateDescription}
+            onRenameTag={tagsState.renameTag}
+            onDeleteTag={tagsState.deleteTag}
+            onAddTag={tagsState.addTag}
+          />
+        )}
       </section>
 
       <section className="panel">

@@ -1,7 +1,7 @@
 import { randomUUID } from "node:crypto";
 import { existsSync } from "node:fs";
 import { extname, join } from "node:path";
-import { mkdir, readFile, rm, writeFile } from "node:fs/promises";
+import { mkdir, readFile, rename, rm, writeFile } from "node:fs/promises";
 
 /**
  * Screen type is an open string, not a fixed enum - see src/main/tags.ts, which manages
@@ -140,6 +140,26 @@ export async function saveDatasetExampleFromFile(
   const buffer = await readFile(input.sourcePath);
   const extension = extname(input.sourcePath).slice(1) || "jpg";
   return persistExample(baseDir, buffer, extension, input);
+}
+
+/**
+ * Retargets every example of a screen type after its tag was renamed: moves the
+ * <baseDir>/<oldType>/ image directory and rewrites the manifest entries.
+ */
+export async function renameScreenType(
+  baseDir: string,
+  oldType: ScreenType,
+  newType: ScreenType,
+): Promise<void> {
+  const entries = await readManifest(baseDir);
+  if (!entries.some((e) => e.screenType === oldType)) return;
+
+  const oldDir = join(baseDir, oldType);
+  if (existsSync(oldDir)) await rename(oldDir, join(baseDir, newType));
+  await writeManifest(
+    baseDir,
+    entries.map((e) => (e.screenType === oldType ? { ...e, screenType: newType } : e)),
+  );
 }
 
 export async function deleteDatasetExample(baseDir: string, id: string): Promise<void> {

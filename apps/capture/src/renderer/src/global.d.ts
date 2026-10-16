@@ -22,6 +22,8 @@ declare global {
       listTags: () => Promise<ScreenTag[]>;
       addTag: (name: string, description: string) => Promise<ScreenTag[]>;
       updateTagDescription: (name: string, description: string) => Promise<ScreenTag[]>;
+      renameTag: (name: string, newName: string) => Promise<ScreenTag[]>;
+      deleteTag: (name: string) => Promise<ScreenTag[]>;
 
       startSession: () => Promise<SessionSummary>;
       appendSessionFrame: (sessionId: string, input: AppendSessionFrameInput) => Promise<SessionFrame>;
