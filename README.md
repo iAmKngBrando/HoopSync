@@ -75,6 +75,20 @@ On first run, macOS/Windows will prompt for camera/capture permission — this i
 the Elgato HD60 X shows up as a standard video-input device once Elgato's own capture
 software (Camera Hub / 4K Capture Utility) has its virtual camera output enabled.
 
+### Sharing recorded/tagged data
+
+```bash
+./scripts/export-dataset.sh                       # your tagged dataset (apps/capture/capture-samples)
+./scripts/export-dataset.sh --include-recordings  # also bundle raw session recordings (much bigger)
+```
+
+Both developers record and tag frames locally (`apps/capture`'s Dataset tab) - that data
+is gitignored, not synced by `git pull`. This packages your tagged dataset (and the tag
+registry it was labeled with) into one `.tar.gz` under `dataset-exports/` (also
+gitignored), ready to send to the other person so it can be aggregated for training/
+calibration work. Prints a per-tag count summary before building the archive. It doesn't
+send anything itself - AirDrop, Slack, a shared drive, whatever's convenient.
+
 ### Desktop launcher
 
 ```bash

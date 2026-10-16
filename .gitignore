@@ -19,3 +19,6 @@ apps/*/dist/
 # db
 *.db
 *.db-journal
+
+# dataset exports staged for sending to a co-developer (scripts/export-dataset.sh)
+dataset-exports/
