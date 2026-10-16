@@ -38,6 +38,17 @@ npx pnpm install
 cd apps/server && uv sync && cd ../..
 ```
 
+### Picking up someone else's changes
+
+```bash
+./update.sh
+```
+
+Pulls, reinstalls JS and server dependencies if anything changed, and reminds you to
+restart HoopSync rather than just reloading a window — main-process/preload code in
+either Electron app only loads once when that app starts, so a page refresh alone
+keeps running the old version.
+
 ### Running everything
 
 ```bash
