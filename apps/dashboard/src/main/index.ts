@@ -1,6 +1,6 @@
 import { join } from "node:path";
 import { app, BrowserWindow, ipcMain, session, shell, systemPreferences } from "electron";
-import { addCard, deleteCard, listBoard, moveCard, type BoardColumn, type BoardTag } from "./devBoard";
+import { addCard, addTag, deleteCard, deleteTag, listBoard, listTags, moveCard, renameTag, type BoardColumn } from "./devBoard";
 
 const CAMERA_PRIVACY_SETTINGS_URL = "x-apple.systempreferences:com.apple.preference.security?Privacy_Camera";
 
@@ -76,11 +76,17 @@ app.whenReady().then(() => {
   ipcMain.handle("dev-board:list", () => listBoard(devBoardPath()));
   ipcMain.handle(
     "dev-board:add",
-    (_event, title: string, note: string | undefined, tag: BoardTag | undefined, author: string | undefined) =>
+    (_event, title: string, note: string | undefined, tag: string | undefined, author: string | undefined) =>
       addCard(devBoardPath(), title, note, tag, author),
   );
   ipcMain.handle("dev-board:move", (_event, id: string, column: BoardColumn) => moveCard(devBoardPath(), id, column));
   ipcMain.handle("dev-board:delete", (_event, id: string) => deleteCard(devBoardPath(), id));
+  ipcMain.handle("dev-board:list-tags", () => listTags(devBoardPath()));
+  ipcMain.handle("dev-board:add-tag", (_event, name: string) => addTag(devBoardPath(), name));
+  ipcMain.handle("dev-board:rename-tag", (_event, name: string, newName: string) =>
+    renameTag(devBoardPath(), name, newName),
+  );
+  ipcMain.handle("dev-board:delete-tag", (_event, name: string) => deleteTag(devBoardPath(), name));
 
   createWindow();
 

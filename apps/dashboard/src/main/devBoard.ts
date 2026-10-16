@@ -1,17 +1,23 @@
 import { existsSync } from "node:fs";
 import { mkdir, readFile, writeFile } from "node:fs/promises";
-import { dirname } from "node:path";
+import { dirname, join } from "node:path";
 import { randomUUID } from "node:crypto";
 
 export type BoardColumn = "todo" | "doing" | "done";
 export type BoardTag = "core" | "cleanup" | "nice-to-have";
+
+/** A tag usable on board cards; custom (non-builtin) tags are managed from the UI. */
+export interface BoardTagDef {
+  name: string;
+  builtin: boolean;
+}
 
 export interface BoardCard {
   id: string;
   title: string;
   note?: string;
   column: BoardColumn;
-  tag?: BoardTag;
+  tag?: string;
   author?: string;
   createdAt: string;
 }
@@ -21,6 +27,13 @@ export interface BoardCard {
  * useful from the first run instead of blank. Only used if references/dev-board.json
  * doesn't exist yet - once it does (checked into git), this is never consulted again.
  */
+/** The board's original three tags; seeded into dev-board-tags.json on first run. */
+const DEFAULT_TAGS: BoardTagDef[] = [
+  { name: "core", builtin: true },
+  { name: "cleanup", builtin: true },
+  { name: "nice-to-have", builtin: true },
+];
+
 const SEED_CARDS: BoardCard[] = [
   {
     id: "seed-1",
@@ -120,12 +133,15 @@ export async function addCard(
   path: string,
   title: string,
   note: string | undefined,
-  tag: BoardTag | undefined,
+  tag: string | undefined,
   author: string | undefined,
 ): Promise<BoardCard[]> {
   const trimmed = title.trim();
   if (!trimmed) throw new Error("Card title can't be empty");
 
+  if (tag && !(await listTags(path)).some((t) => t.name === tag)) {
+    throw new Error(`Unknown tag "${tag}"`);
+  }
   const cards = await listBoard(path);
   const card: BoardCard = {
     id: randomUUID(),
@@ -152,5 +168,90 @@ export async function deleteCard(path: string, id: string): Promise<BoardCard[]>
   const cards = await listBoard(path);
   const next = cards.filter((c) => c.id !== id);
   await writeBoard(path, next);
+  return next;
+}
+
+// Tags ------------------------------------------------------------------
+// Tag definitions live in dev-board-tags.json next to dev-board.json, so custom
+// tags sync between co-developers the same way cards do.
+
+function tagsPath(boardPath: string): string {
+  return join(dirname(boardPath), "dev-board-tags.json");
+}
+
+async function readTags(path: string): Promise<BoardTagDef[]> {
+  const raw = await readFile(path, "utf-8");
+  return JSON.parse(raw) as BoardTagDef[];
+}
+
+async function writeTags(path: string, tags: BoardTagDef[]): Promise<void> {
+  await mkdir(dirname(path), { recursive: true });
+  await writeFile(path, JSON.stringify(tags, null, 2) + "\n", "utf-8");
+}
+
+/** Seeds dev-board-tags.json on first run so it's visible/editable as a real file. */
+export async function listTags(boardPath: string): Promise<BoardTagDef[]> {
+  const path = tagsPath(boardPath);
+  if (!existsSync(path)) {
+    await writeTags(path, DEFAULT_TAGS);
+    return DEFAULT_TAGS;
+  }
+  return readTags(path);
+}
+
+export async function addTag(boardPath: string, name: string): Promise<BoardTagDef[]> {
+  const trimmed = name.trim();
+  if (!trimmed) throw new Error("Tag name can't be empty");
+
+  const tags = await listTags(boardPath);
+  if (tags.some((t) => t.name.toLowerCase() === trimmed.toLowerCase())) {
+    throw new Error(`Tag "${trimmed}" already exists`);
+  }
+  const next = [...tags, { name: trimmed, builtin: false }];
+  await writeTags(tagsPath(boardPath), next);
+  return next;
+}
+
+/** Renames a custom tag and rewrites it on every card that uses it. */
+export async function renameTag(
+  boardPath: string,
+  name: string,
+  newName: string,
+): Promise<BoardTagDef[]> {
+  const trimmed = newName.trim();
+  if (!trimmed) throw new Error("Tag name can't be empty");
+
+  const tags = await listTags(boardPath);
+  const tag = tags.find((t) => t.name === name);
+  if (!tag) throw new Error(`Unknown tag "${name}"`);
+  if (tag.builtin) throw new Error(`"${name}" is a built-in tag`);
+  if (tags.some((t) => t.name !== name && t.name.toLowerCase() === trimmed.toLowerCase())) {
+    throw new Error(`Tag "${trimmed}" already exists`);
+  }
+
+  const next = tags.map((t) => (t.name === name ? { ...t, name: trimmed } : t));
+  await writeTags(tagsPath(boardPath), next);
+  const cards = await listBoard(boardPath);
+  await writeBoard(
+    boardPath,
+    cards.map((c) => (c.tag === name ? { ...c, tag: trimmed } : c)),
+  );
+  return next;
+}
+
+/** Deletes a custom tag and clears it from every card that uses it. */
+export async function deleteTag(boardPath: string, name: string): Promise<BoardTagDef[]> {
+  const tags = await listTags(boardPath);
+  const tag = tags.find((t) => t.name === name);
+  if (!tag) return tags;
+  if (tag.builtin) throw new Error(`"${name}" is a built-in tag`);
+
+  const next = tags.filter((t) => t.name !== name);
+  await writeTags(tagsPath(boardPath), next);
+  const cards = await listBoard(boardPath);
+  await writeBoard(
+    boardPath,
+    cards.map((c) => (c.tag === name ? { ...c, tag: undefined } : c)),
+  );
   return next;
 }

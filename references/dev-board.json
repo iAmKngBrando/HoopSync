@@ -71,5 +71,13 @@
     "column": "todo",
     "tag": "nice-to-have",
     "createdAt": "2026-10-15T12:00:00.000Z"
+  },
+  {
+    "id": "f375db46-e480-47a2-8066-8c0184ba8e98",
+    "title": "Create tag for Proving Grounds Player Matchup",
+    "column": "todo",
+    "tag": "core",
+    "author": "Brando",
+    "createdAt": "2026-10-16T04:43:46.713Z"
   }
 ]

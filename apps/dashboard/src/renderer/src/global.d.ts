@@ -4,14 +4,18 @@
 type CameraAccessStatus = "not-determined" | "granted" | "denied" | "restricted" | "unknown";
 
 type BoardColumn = "todo" | "doing" | "done";
-type BoardTag = "core" | "cleanup" | "nice-to-have";
+
+interface BoardTagDef {
+  name: string;
+  builtin: boolean;
+}
 
 interface BoardCard {
   id: string;
   title: string;
   note?: string;
   column: BoardColumn;
-  tag?: BoardTag;
+  tag?: string;
   author?: string;
   createdAt: string;
 }
@@ -24,9 +28,13 @@ declare global {
       openCameraPrivacySettings: () => Promise<void>;
       devBoard: {
         list: () => Promise<BoardCard[]>;
-        addCard: (title: string, note: string | undefined, tag: BoardTag | undefined, author: string | undefined) => Promise<BoardCard[]>;
+        addCard: (title: string, note: string | undefined, tag: string | undefined, author: string | undefined) => Promise<BoardCard[]>;
         moveCard: (id: string, column: BoardColumn) => Promise<BoardCard[]>;
         deleteCard: (id: string) => Promise<BoardCard[]>;
+        listTags: () => Promise<BoardTagDef[]>;
+        addTag: (name: string) => Promise<BoardTagDef[]>;
+        renameTag: (name: string, newName: string) => Promise<BoardTagDef[]>;
+        deleteTag: (name: string) => Promise<BoardTagDef[]>;
       };
     };
   }

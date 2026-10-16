@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react';
-import { Plus, Trash2 } from 'lucide-react';
+import { Pencil, Plus, Trash2, X } from 'lucide-react';
 import { Card, EmptyState, SectionHeader } from '../../components/ui/Card';
 import { useFriendsConfig } from '../friends/FriendsContext';
-import { COLUMNS, TAG_STYLES, type BoardCard, type BoardColumn, type BoardTag } from './types';
+import { COLUMNS, tagStyle, type BoardCard, type BoardColumn, type BoardTagDef } from './types';
 
 const inputClass =
   'w-full rounded-lg border border-border-muted bg-inset px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:border-primary/60 focus:outline-none focus:ring-2 focus:ring-primary/20';
@@ -16,16 +16,22 @@ const inputClass =
 export function DevBoardPanel() {
   const { config } = useFriendsConfig();
   const [cards, setCards] = useState<BoardCard[] | null>(null);
+  const [tags, setTags] = useState<BoardTagDef[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [title, setTitle] = useState('');
   const [note, setNote] = useState('');
-  const [tag, setTag] = useState<BoardTag | ''>('');
+  const [tag, setTag] = useState('');
+  const [addingTag, setAddingTag] = useState(false);
+  const [newTag, setNewTag] = useState('');
+  const [editingTag, setEditingTag] = useState<string | null>(null);
+  const [tagDraft, setTagDraft] = useState('');
 
   const api = window.hoopsync?.devBoard;
 
   useEffect(() => {
     if (!api) return;
     api.list().then(setCards).catch((e) => setError(String(e)));
+    api.listTags().then(setTags).catch((e) => setError(String(e)));
   }, [api]);
 
   if (!api) {
@@ -69,6 +75,37 @@ export function DevBoardPanel() {
     }
   }
 
+  async function addNewTag() {
+    if (!newTag.trim()) return;
+    try {
+      setTags(await api!.addTag(newTag));
+      setNewTag('');
+      setAddingTag(false);
+    } catch (e) {
+      setError(String(e));
+    }
+  }
+
+  async function rename(name: string) {
+    try {
+      setTags(await api!.renameTag(name, tagDraft));
+      setEditingTag(null);
+      setCards(await api!.list()); // renamed tags rewrite the cards that use them
+    } catch (e) {
+      setError(String(e));
+    }
+  }
+
+  async function removeTag(name: string) {
+    try {
+      setTags(await api!.deleteTag(name));
+      setCards(await api!.list()); // deleted tags are cleared from cards
+      if (tag === name) setTag('');
+    } catch (e) {
+      setError(String(e));
+    }
+  }
+
   return (
     <Card label="Developer board">
       <SectionHeader title="DEV BOARD" note="checked into git - commit + push to share" />
@@ -95,11 +132,11 @@ export function DevBoardPanel() {
           placeholder="Note (optional)"
           className={`${inputClass} col-span-2 sm:col-span-1`}
         />
-        <select value={tag} onChange={(e) => setTag(e.target.value as BoardTag | '')} className={inputClass}>
+        <select value={tag} onChange={(e) => setTag(e.target.value)} className={inputClass}>
           <option value="">No tag</option>
-          {Object.entries(TAG_STYLES).map(([key, style]) => (
-            <option key={key} value={key}>
-              {style.label}
+          {tags.map((t) => (
+            <option key={t.name} value={t.name}>
+              {tagStyle(t.name).label}
             </option>
           ))}
         </select>
@@ -112,6 +149,84 @@ export function DevBoardPanel() {
           <Plus className="size-4" />
           Add
         </button>
+      </div>
+
+      <div className="mb-4 flex flex-wrap items-center gap-1.5">
+        <span className="mr-1 text-[11px] font-bold uppercase tracking-wide text-foreground-secondary">
+          Tags
+        </span>
+        {tags.map((t) =>
+          editingTag === t.name ? (
+            <input
+              key={t.name}
+              autoFocus
+              value={tagDraft}
+              onChange={(e) => setTagDraft(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') rename(t.name);
+                if (e.key === 'Escape') setEditingTag(null);
+              }}
+              className="w-28 rounded border border-border-muted bg-inset px-1.5 py-0.5 text-[10px] font-semibold text-foreground focus:border-primary/60 focus:outline-none"
+            />
+          ) : (
+            <span
+              key={t.name}
+              className={`inline-flex items-center gap-1 rounded px-1.5 py-0.5 text-[10px] font-semibold ${tagStyle(t.name).className}`}
+            >
+              {tagStyle(t.name).label}
+              {!t.builtin && (
+                <>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setEditingTag(t.name);
+                      setTagDraft(t.name);
+                    }}
+                    aria-label={`Rename tag ${t.name}`}
+                    title="Rename tag"
+                    className="opacity-60 transition-opacity hover:opacity-100"
+                  >
+                    <Pencil className="size-2.5" aria-hidden="true" />
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => removeTag(t.name)}
+                    aria-label={`Delete tag ${t.name}`}
+                    title="Delete tag"
+                    className="opacity-60 transition-opacity hover:opacity-100"
+                  >
+                    <X className="size-3" aria-hidden="true" />
+                  </button>
+                </>
+              )}
+            </span>
+          ),
+        )}
+        {addingTag ? (
+          <input
+            autoFocus
+            value={newTag}
+            onChange={(e) => setNewTag(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter') addNewTag();
+              if (e.key === 'Escape') {
+                setAddingTag(false);
+                setNewTag('');
+              }
+            }}
+            placeholder="New tag"
+            className="w-28 rounded border border-border-muted bg-inset px-1.5 py-0.5 text-[10px] font-semibold text-foreground placeholder:text-muted-foreground focus:border-primary/60 focus:outline-none"
+          />
+        ) : (
+          <button
+            type="button"
+            onClick={() => setAddingTag(true)}
+            className="inline-flex items-center gap-1 rounded px-1.5 py-0.5 text-[10px] font-semibold text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+          >
+            <Plus className="size-3" aria-hidden="true" />
+            Add Tag
+          </button>
+        )}
       </div>
 
       {cards === null ? (
@@ -169,8 +284,8 @@ function BoardCardItem({
       <div className="mt-2 flex items-center justify-between gap-2">
         <div className="flex items-center gap-1.5">
           {card.tag && (
-            <span className={`rounded px-1.5 py-0.5 text-[10px] font-semibold ${TAG_STYLES[card.tag].className}`}>
-              {TAG_STYLES[card.tag].label}
+            <span className={`rounded px-1.5 py-0.5 text-[10px] font-semibold ${tagStyle(card.tag).className}`}>
+              {tagStyle(card.tag).label}
             </span>
           )}
           {card.author && <span className="text-[10px] text-muted-foreground">by {card.author}</span>}
