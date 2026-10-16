@@ -1,6 +1,7 @@
 interface SessionRecorderControlsProps {
   isRecording: boolean;
   frameCount: number;
+  error?: string | null;
   captureStatus: "CONNECTED" | "CONNECTING" | "DISCONNECTED" | "ERROR";
   onStart: () => void;
   onStop: () => void;
@@ -9,6 +10,7 @@ interface SessionRecorderControlsProps {
 export function SessionRecorderControls({
   isRecording,
   frameCount,
+  error,
   captureStatus,
   onStart,
   onStop,
@@ -31,6 +33,7 @@ export function SessionRecorderControls({
         )}
         {!isRecording && <span className="muted">Samples ~2 frames/sec while recording - review and label afterward below.</span>}
       </div>
+      {error && <p className="error">{error}</p>}
     </section>
   );
 }

@@ -1,4 +1,4 @@
-import { useState, type RefObject } from "react";
+import { useEffect, useState, type RefObject } from "react";
 import type { DeviceStatus } from "../capture/types";
 import { DatasetGallery } from "./DatasetGallery";
 import { captureFromVideo, loadImageFile } from "./imageUtils";
@@ -66,6 +66,11 @@ export function DatasetView({ videoRef, captureStatus }: DatasetViewProps) {
     setJustFinishedSessionId(finishedId);
   }
 
+  // If recording auto-stopped on save failures, open whatever was captured for review.
+  useEffect(() => {
+    if (recording.error && recording.sessionId) setJustFinishedSessionId(recording.sessionId);
+  }, [recording.error, recording.sessionId]);
+
   return (
     <>
       <section className="panel">
@@ -96,6 +101,7 @@ export function DatasetView({ videoRef, captureStatus }: DatasetViewProps) {
       <SessionRecorderControls
         isRecording={recording.isRecording}
         frameCount={recording.frameCount}
+        error={recording.error}
         captureStatus={captureStatus}
         onStart={recording.start}
         onStop={handleStopRecording}
