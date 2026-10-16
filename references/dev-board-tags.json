@@ -1,0 +1,14 @@
+[
+  {
+    "name": "core",
+    "builtin": true
+  },
+  {
+    "name": "cleanup",
+    "builtin": true
+  },
+  {
+    "name": "nice-to-have",
+    "builtin": true
+  }
+]

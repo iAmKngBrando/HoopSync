@@ -47,6 +47,20 @@ async function writeIndex(baseDir: string, sessionId: string, index: SessionInde
   await rename(tmp, path);
 }
 
+// Appends arrive at 2fps while each write gets slower as the index grows, so they
+// overlap - and two writers sharing index.json.tmp can interleave and corrupt the
+// file. Serialize every read-modify-write on a session's index instead.
+const sessionQueues = new Map<string, Promise<void>>();
+
+function withSessionLock<T>(sessionId: string, fn: () => Promise<T>): Promise<T> {
+  const next = (sessionQueues.get(sessionId) ?? Promise.resolve()).then(fn, fn);
+  sessionQueues.set(
+    sessionId,
+    next.then(() => undefined, () => undefined),
+  );
+  return next;
+}
+
 export async function startSession(baseDir: string): Promise<SessionSummary> {
   const id = randomUUID();
   const startedAt = new Date().toISOString();
@@ -78,24 +92,26 @@ export async function appendSessionFrame(
   sessionId: string,
   input: AppendSessionFrameInput,
 ): Promise<SessionFrame> {
-  const index = await readIndex(baseDir, sessionId);
-  const { buffer, extension } = dataUrlToBuffer(input.imageDataUrl);
-  const id = randomUUID();
-  const filename = `${id}.${extension}`;
-  await writeFile(join(sessionDir(baseDir, sessionId), filename), buffer);
+  return withSessionLock(sessionId, async () => {
+    const index = await readIndex(baseDir, sessionId);
+    const { buffer, extension } = dataUrlToBuffer(input.imageDataUrl);
+    const id = randomUUID();
+    const filename = `${id}.${extension}`;
+    await writeFile(join(sessionDir(baseDir, sessionId), filename), buffer);
 
-  const frame: SessionFrame = {
-    id,
-    sequence: index.frames.length,
-    timestamp: Date.now(),
-    filename,
-    width: input.width,
-    height: input.height,
-    thumbnailDataUrl: input.thumbnailDataUrl,
-  };
-  index.frames.push(frame);
-  await writeIndex(baseDir, sessionId, index);
-  return frame;
+    const frame: SessionFrame = {
+      id,
+      sequence: index.frames.length,
+      timestamp: Date.now(),
+      filename,
+      width: input.width,
+      height: input.height,
+      thumbnailDataUrl: input.thumbnailDataUrl,
+    };
+    index.frames.push(frame);
+    await writeIndex(baseDir, sessionId, index);
+    return frame;
+  });
 }
 
 export async function listSessions(baseDir: string): Promise<SessionSummary[]> {
@@ -105,8 +121,13 @@ export async function listSessions(baseDir: string): Promise<SessionSummary[]> {
   for (const entry of ids) {
     if (!entry.isDirectory()) continue;
     if (!existsSync(indexPath(baseDir, entry.name))) continue;
-    const index = await readIndex(baseDir, entry.name);
-    summaries.push({ id: entry.name, startedAt: index.startedAt, frameCount: index.frames.length });
+    try {
+      const index = await readIndex(baseDir, entry.name);
+      summaries.push({ id: entry.name, startedAt: index.startedAt, frameCount: index.frames.length });
+    } catch {
+      // One unreadable index shouldn't blank the whole review panel.
+      console.warn(`Skipping session ${entry.name}: unreadable index.json`);
+    }
   }
   return summaries.sort((a, b) => b.startedAt.localeCompare(a.startedAt));
 }
@@ -123,18 +144,22 @@ export function sessionFramePath(baseDir: string, sessionId: string, filename: s
 }
 
 export async function discardSessionFrames(baseDir: string, sessionId: string, frameIds: string[]): Promise<void> {
-  const index = await readIndex(baseDir, sessionId);
-  const idSet = new Set(frameIds);
-  for (const frame of index.frames) {
-    if (!idSet.has(frame.id)) continue;
-    const filePath = sessionFramePath(baseDir, sessionId, frame.filename);
-    if (existsSync(filePath)) await rm(filePath);
-  }
-  index.frames = index.frames.filter((f) => !idSet.has(f.id));
-  await writeIndex(baseDir, sessionId, index);
+  return withSessionLock(sessionId, async () => {
+    const index = await readIndex(baseDir, sessionId);
+    const idSet = new Set(frameIds);
+    for (const frame of index.frames) {
+      if (!idSet.has(frame.id)) continue;
+      const filePath = sessionFramePath(baseDir, sessionId, frame.filename);
+      if (existsSync(filePath)) await rm(filePath);
+    }
+    index.frames = index.frames.filter((f) => !idSet.has(f.id));
+    await writeIndex(baseDir, sessionId, index);
+  });
 }
 
 /** Deletes an entire session's staging directory - used once every frame has been committed or discarded. */
 export async function discardSession(baseDir: string, sessionId: string): Promise<void> {
-  await rm(sessionDir(baseDir, sessionId), { recursive: true, force: true });
+  return withSessionLock(sessionId, () =>
+    rm(sessionDir(baseDir, sessionId), { recursive: true, force: true }).then(() => undefined),
+  );
 }
