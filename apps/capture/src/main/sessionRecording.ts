@@ -1,6 +1,6 @@
 import { randomUUID } from "node:crypto";
 import { existsSync } from "node:fs";
-import { mkdir, readdir, readFile, rm, writeFile } from "node:fs/promises";
+import { mkdir, readdir, readFile, rename, rm, writeFile } from "node:fs/promises";
 import { join } from "node:path";
 
 export interface SessionFrame {
@@ -38,8 +38,13 @@ async function readIndex(baseDir: string, sessionId: string): Promise<SessionInd
   return JSON.parse(raw) as SessionIndex;
 }
 
+// Write via a temp file + rename so concurrent readers (listSessions/listSessionFrames
+// while a frame append is still in flight) never see a half-written index.json.
 async function writeIndex(baseDir: string, sessionId: string, index: SessionIndex): Promise<void> {
-  await writeFile(indexPath(baseDir, sessionId), JSON.stringify(index, null, 2), "utf-8");
+  const path = indexPath(baseDir, sessionId);
+  const tmp = `${path}.tmp`;
+  await writeFile(tmp, JSON.stringify(index, null, 2), "utf-8");
+  await rename(tmp, path);
 }
 
 export async function startSession(baseDir: string): Promise<SessionSummary> {
