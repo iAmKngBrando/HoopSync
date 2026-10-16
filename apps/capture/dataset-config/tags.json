@@ -43,5 +43,60 @@
     "name": "proving_grounds_player_matchup",
     "description": "Pre-game \"Proving Grounds PLAYER MATCHUP\" screen comparing you and your opponent.",
     "builtin": false
+  },
+  {
+    "name": "theater_player_matchup",
+    "description": "Pre-game \"Theater PLAYER MATCHUP\" screen comparing you and your opponent.",
+    "builtin": false
+  },
+  {
+    "name": "Idle",
+    "description": "",
+    "builtin": false
+  },
+  {
+    "name": "rec_player_matchup",
+    "description": "Pre-game \"Rec PLAYER MATCHUP\" screen comparing you and your opponent.",
+    "builtin": false
+  },
+  {
+    "name": "proving_grounds_1v1_opponent_team",
+    "description": "",
+    "builtin": false
+  },
+  {
+    "name": "proving_grounds_1v1_team",
+    "description": "",
+    "builtin": false
+  },
+  {
+    "name": "proving_grounds_2v2_team",
+    "description": "",
+    "builtin": false
+  },
+  {
+    "name": "proving_grounds_3v3_team",
+    "description": "",
+    "builtin": false
+  },
+  {
+    "name": "proving_grounds_2v2_opponent_team",
+    "description": "",
+    "builtin": false
+  },
+  {
+    "name": "proving_grounds_3v3_opponent_team",
+    "description": "",
+    "builtin": false
+  },
+  {
+    "name": "proving_grounds_load_screen",
+    "description": "",
+    "builtin": false
+  },
+  {
+    "name": "my_career_recap_end_game",
+    "description": "",
+    "builtin": false
   }
 ]
