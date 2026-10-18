@@ -7,9 +7,11 @@ interface SessionReviewerProps {
   onCreateTag: (name: string, description: string) => Promise<void>;
   /** Most recently completed recording, if any - auto-selected for review. */
   activeSessionId: string | null;
+  /** Called after frames are committed so the dataset gallery can refresh. */
+  onCommitted?: () => Promise<void> | void;
 }
 
-export function SessionReviewer({ tags, onCreateTag, activeSessionId }: SessionReviewerProps) {
+export function SessionReviewer({ tags, onCreateTag, activeSessionId, onCommitted }: SessionReviewerProps) {
   const [sessions, setSessions] = useState<SessionSummary[]>([]);
   const [selectedSessionId, setSelectedSessionId] = useState<string | null>(null);
   const [frames, setFrames] = useState<SessionFrame[]>([]);
@@ -63,6 +65,7 @@ export function SessionReviewer({ tags, onCreateTag, activeSessionId }: SessionR
     await window.hoopsync.commitSessionFrames(selectedSessionId, [...selectedFrameIds], labelType);
     await refreshFrames(selectedSessionId);
     await refreshSessions();
+    await onCommitted?.();
   }
 
   async function discardSelected() {

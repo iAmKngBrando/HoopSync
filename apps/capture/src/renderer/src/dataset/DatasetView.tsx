@@ -111,6 +111,7 @@ export function DatasetView({ videoRef, captureStatus }: DatasetViewProps) {
         tags={tagsState.tags}
         onCreateTag={(name, description) => tagsState.addTag(name, description)}
         activeSessionId={justFinishedSessionId}
+        onCommitted={dataset.refresh}
       />
 
       <section className="panel">
