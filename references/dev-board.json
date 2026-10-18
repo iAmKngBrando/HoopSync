@@ -87,5 +87,14 @@
     "tag": "nice-to-have",
     "author": "Brando",
     "createdAt": "2026-10-16T18:31:13.387Z"
+  },
+  {
+    "id": "0812e935-eeb5-422b-994e-f52fbf18b5b6",
+    "title": "add created convos",
+    "note": "when looking at badges or attributes allow Ai to converse recommendations based on previous data",
+    "column": "todo",
+    "tag": "nice-to-have",
+    "author": "Brando",
+    "createdAt": "2026-10-16T18:34:56.098Z"
   }
 ]
