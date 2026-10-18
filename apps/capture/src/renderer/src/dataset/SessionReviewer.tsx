@@ -18,6 +18,8 @@ export function SessionReviewer({ tags, onCreateTag, activeSessionId, onCommitte
   const [selectedFrameIds, setSelectedFrameIds] = useState<Set<string>>(new Set());
   const [labelType, setLabelType] = useState("other");
   const [loading, setLoading] = useState(false);
+  const [preview, setPreview] = useState<SessionFrame | null>(null);
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
 
   const refreshSessions = useCallback(async () => {
     if (!window.hoopsync) return;
@@ -50,6 +52,22 @@ export function SessionReviewer({ tags, onCreateTag, activeSessionId, onCommitte
     if (selectedSessionId) refreshFrames(selectedSessionId);
     else setFrames([]);
   }, [selectedSessionId, refreshFrames]);
+
+  // Fetch the full-res frame for the preview overlay; thumbnails are too small to classify.
+  useEffect(() => {
+    setPreviewUrl(null);
+    if (!preview || !selectedSessionId || !window.hoopsync) return;
+    let cancelled = false;
+    window.hoopsync
+      .sessionFrameImage(selectedSessionId, preview.id)
+      .then((url) => {
+        if (!cancelled && url) setPreviewUrl(url);
+      })
+      .catch(() => {});
+    return () => {
+      cancelled = true;
+    };
+  }, [preview, selectedSessionId]);
 
   function toggleFrame(id: string) {
     setSelectedFrameIds((prev) => {
@@ -119,10 +137,17 @@ export function SessionReviewer({ tags, onCreateTag, activeSessionId, onCommitte
 
               <div className="gallery__grid gallery__grid--selectable">
                 {frames.map((frame) => (
-                  <label key={frame.id} className={`session-frame${selectedFrameIds.has(frame.id) ? " session-frame--selected" : ""}`}>
+                  <div key={frame.id} className={`session-frame${selectedFrameIds.has(frame.id) ? " session-frame--selected" : ""}`}>
                     <input type="checkbox" checked={selectedFrameIds.has(frame.id)} onChange={() => toggleFrame(frame.id)} />
-                    <img src={frame.thumbnailDataUrl} alt={`Session frame ${frame.sequence}`} />
-                  </label>
+                    <button
+                      type="button"
+                      className="session-frame__image"
+                      onClick={() => setPreview(frame)}
+                      title="Expand"
+                    >
+                      <img src={frame.thumbnailDataUrl} alt={`Session frame ${frame.sequence}`} />
+                    </button>
+                  </div>
                 ))}
               </div>
 
@@ -139,6 +164,13 @@ export function SessionReviewer({ tags, onCreateTag, activeSessionId, onCommitte
             </>
           )}
         </>
+      )}
+
+      {preview && (
+        <div className="lightbox" onClick={() => setPreview(null)}>
+          <img src={previewUrl ?? preview.thumbnailDataUrl} alt={`Session frame ${preview.sequence}`} />
+          <div className="lightbox__caption">Frame {preview.sequence} · click anywhere to close</div>
+        </div>
       )}
     </section>
   );

@@ -29,6 +29,7 @@ declare global {
       appendSessionFrame: (sessionId: string, input: AppendSessionFrameInput) => Promise<SessionFrame>;
       listSessions: () => Promise<SessionSummary[]>;
       listSessionFrames: (sessionId: string) => Promise<SessionFrame[]>;
+      sessionFrameImage: (sessionId: string, frameId: string) => Promise<string | null>;
       discardSessionFrames: (sessionId: string, frameIds: string[]) => Promise<void>;
       discardSession: (sessionId: string) => Promise<void>;
       commitSessionFrames: (sessionId: string, frameIds: string[], screenType: string) => Promise<DatasetExample[]>;

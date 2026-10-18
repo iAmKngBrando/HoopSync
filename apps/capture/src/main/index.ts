@@ -14,6 +14,7 @@ import {
   discardSessionFrames,
   listSessionFrames,
   listSessions,
+  sessionFrameDataUrl,
   sessionFramePath,
   startSession,
   type AppendSessionFrameInput,
@@ -128,6 +129,9 @@ app.whenReady().then(() => {
   ipcMain.handle("session:list", () => listSessions(sessionRecordingsDir()));
   ipcMain.handle("session:list-frames", (_event, sessionId: string) =>
     listSessionFrames(sessionRecordingsDir(), sessionId),
+  );
+  ipcMain.handle("session:frame-image", (_event, sessionId: string, frameId: string) =>
+    sessionFrameDataUrl(sessionRecordingsDir(), sessionId, frameId),
   );
   ipcMain.handle("session:discard-frames", (_event, sessionId: string, frameIds: string[]) =>
     discardSessionFrames(sessionRecordingsDir(), sessionId, frameIds),

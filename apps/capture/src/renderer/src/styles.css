@@ -424,8 +424,16 @@ button:hover {
 
 .session-frame {
   position: relative;
-  width: 100px;
-  cursor: pointer;
+  width: 140px;
+  display: block;
+}
+
+.session-frame__image {
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: zoom-in;
+  width: 100%;
   display: block;
 }
 

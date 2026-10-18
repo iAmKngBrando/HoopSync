@@ -36,6 +36,8 @@ contextBridge.exposeInMainWorld("hoopsync", {
   listSessions: (): Promise<SessionSummary[]> => ipcRenderer.invoke("session:list"),
   listSessionFrames: (sessionId: string): Promise<SessionFrame[]> =>
     ipcRenderer.invoke("session:list-frames", sessionId),
+  sessionFrameImage: (sessionId: string, frameId: string): Promise<string | null> =>
+    ipcRenderer.invoke("session:frame-image", sessionId, frameId),
   discardSessionFrames: (sessionId: string, frameIds: string[]): Promise<void> =>
     ipcRenderer.invoke("session:discard-frames", sessionId, frameIds),
   discardSession: (sessionId: string): Promise<void> => ipcRenderer.invoke("session:discard", sessionId),

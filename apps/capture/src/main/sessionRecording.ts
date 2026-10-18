@@ -143,6 +143,20 @@ export function sessionFramePath(baseDir: string, sessionId: string, filename: s
   return join(sessionDir(baseDir, sessionId), filename);
 }
 
+/** Full-resolution frame as a data URL - the review thumbnails are too small to classify by. */
+export async function sessionFrameDataUrl(
+  baseDir: string,
+  sessionId: string,
+  frameId: string,
+): Promise<string | null> {
+  const index = await readIndex(baseDir, sessionId);
+  const frame = index.frames.find((f) => f.id === frameId);
+  if (!frame) return null;
+  const buffer = await readFile(sessionFramePath(baseDir, sessionId, frame.filename));
+  const mime = frame.filename.endsWith(".png") ? "image/png" : "image/jpeg";
+  return `data:${mime};base64,${buffer.toString("base64")}`;
+}
+
 export async function discardSessionFrames(baseDir: string, sessionId: string, frameIds: string[]): Promise<void> {
   return withSessionLock(sessionId, async () => {
     const index = await readIndex(baseDir, sessionId);
