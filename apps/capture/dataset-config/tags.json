@@ -98,5 +98,75 @@
     "name": "my_career_recap_end_game",
     "description": "",
     "builtin": false
+  },
+  {
+    "name": "theater_1v1_opponent_team",
+    "description": "",
+    "builtin": false
+  },
+  {
+    "name": "theater_1v1_team",
+    "description": "",
+    "builtin": false
+  },
+  {
+    "name": "theater_2v2_team",
+    "description": "",
+    "builtin": false
+  },
+  {
+    "name": "theater_2v2_opponent_team",
+    "description": "",
+    "builtin": false
+  },
+  {
+    "name": "theater_3v3_opponent_team",
+    "description": "",
+    "builtin": false
+  },
+  {
+    "name": "theater_3v3_team",
+    "description": "",
+    "builtin": false
+  },
+  {
+    "name": "theater_load_screen",
+    "description": "",
+    "builtin": false
+  },
+  {
+    "name": "crew_load_screen",
+    "description": "",
+    "builtin": false
+  },
+  {
+    "name": "crew_3v3_opponent_team",
+    "description": "",
+    "builtin": false
+  },
+  {
+    "name": "crew_3v3_team",
+    "description": "",
+    "builtin": false
+  },
+  {
+    "name": "crew_5v5_team",
+    "description": "",
+    "builtin": false
+  },
+  {
+    "name": "crew_5v5_opponent_team",
+    "description": "",
+    "builtin": false
+  },
+  {
+    "name": "rec_5v5_team",
+    "description": "",
+    "builtin": false
+  },
+  {
+    "name": "rec_5v5_opponent_team",
+    "description": "",
+    "builtin": false
   }
 ]
