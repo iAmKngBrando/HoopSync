@@ -11,12 +11,18 @@ export interface ScreenTag {
 }
 
 /**
- * Mirrors ScreenKind in apps/server/src/twokot/session.py ("Values match the capture
- * tool's labels" - this is that match). apps/server's screens.py is the thing actually
- * being trained/recalibrated, so labeling with anything else just produces data nobody
- * can use - these are the exact categories classify() sorts a frame into. Names are
- * ScreenKind's own string values (lowercase, not HoopSync's older SCREAMING_CASE style)
- * so a labeled dataset can be compared directly against fixture expected.json files.
+ * Mostly mirrors ScreenKind in apps/server/src/twokot/session.py ("Values match the
+ * capture tool's labels" - this is that match), since apps/server's screens.py is the
+ * thing actually being trained/recalibrated - labeling with a name classify() can't
+ * produce is otherwise wasted effort. Names are ScreenKind's own string values
+ * (lowercase, not HoopSync's older SCREAMING_CASE style) so a labeled dataset can be
+ * compared directly against fixture expected.json files.
+ *
+ * One deliberate exception: there's no single "player_matchup" tag. The matchup screen's
+ * exact layout may differ per location/setting (Proving Grounds, Theater, Rec, ...), so
+ * labeling starts split by location (see the location-specific *_player_matchup tags
+ * added via the UI) even though classify() still only emits one generic ScreenKind.MATCHUP
+ * today - splitting the data now means it's ready whenever that becomes per-location too.
  */
 const DEFAULT_TAGS: ScreenTag[] = [
   {
@@ -27,11 +33,6 @@ const DEFAULT_TAGS: ScreenTag[] = [
   {
     name: "opponent_player_load_screen",
     description: "Opponent's MyPlayer card during pre-game load-in.",
-    builtin: true,
-  },
-  {
-    name: "player_matchup",
-    description: "Pre-game \"PLAYER MATCHUP\" screen comparing you and your opponent.",
     builtin: true,
   },
   {
