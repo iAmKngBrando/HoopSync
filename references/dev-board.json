@@ -96,5 +96,13 @@
     "tag": "nice-to-have",
     "author": "Brando",
     "createdAt": "2026-10-16T18:34:56.098Z"
+  },
+  {
+    "id": "a3f1c8e2-6b4d-4e9a-9c1f-7d2e5b8a3c6f",
+    "title": "Retag the 7 old player_matchup examples by location",
+    "note": "player_matchup was removed as a tag in favor of location-specific ones (proving_grounds_player_matchup, theater_player_matchup, ...). The 7 examples still labeled plain \"player_matchup\" in capture-samples/ need to be moved to the right location tag before they're used for training.",
+    "column": "todo",
+    "tag": "core",
+    "createdAt": "2026-10-19T00:00:00.000Z"
   }
 ]
