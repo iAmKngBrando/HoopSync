@@ -22,3 +22,5 @@ apps/*/dist/
 
 # dataset exports staged for sending to a co-developer (scripts/export-dataset.sh)
 dataset-exports/
+# incoming dataset exports received from a co-developer (scripts/import-dataset.sh)
+imports/
