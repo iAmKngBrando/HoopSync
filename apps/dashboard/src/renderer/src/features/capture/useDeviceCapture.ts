@@ -10,6 +10,9 @@ export type DeviceCaptureStatus = "disconnected" | "connecting" | "connected" | 
 
 export interface DeviceCaptureControls {
   videoRef: RefObject<HTMLVideoElement>;
+  /** The raw stream, so a separate preview <video> (e.g. in Settings) can attach to
+   * the same source without re-requesting the device - see DeviceCaptureContext. */
+  stream: MediaStream | null;
   devices: MediaDeviceInfo[];
   selectedDeviceId: string | null;
   status: DeviceCaptureStatus;
@@ -21,6 +24,7 @@ export interface DeviceCaptureControls {
 
 export function useDeviceCapture(): DeviceCaptureControls {
   const videoRef = useRef<HTMLVideoElement>(null);
+  const [stream, setStream] = useState<MediaStream | null>(null);
   const [devices, setDevices] = useState<MediaDeviceInfo[]>([]);
   const [selectedDeviceId, setSelectedDeviceId] = useState<string | null>(null);
   const [status, setStatus] = useState<DeviceCaptureStatus>("disconnected");
@@ -37,9 +41,10 @@ export function useDeviceCapture(): DeviceCaptureControls {
   }, []);
 
   const disconnect = useCallback(() => {
-    const stream = videoRef.current?.srcObject as MediaStream | null;
-    stream?.getTracks().forEach((track) => track.stop());
+    const current = videoRef.current?.srcObject as MediaStream | null;
+    current?.getTracks().forEach((track) => track.stop());
     if (videoRef.current) videoRef.current.srcObject = null;
+    setStream(null);
     setStatus("disconnected");
     setSelectedDeviceId(null);
   }, []);
@@ -59,6 +64,7 @@ export function useDeviceCapture(): DeviceCaptureControls {
           videoRef.current.srcObject = stream;
           await videoRef.current.play().catch(() => {});
         }
+        setStream(stream);
         const track = stream.getVideoTracks()[0];
         setSelectedDeviceId(track?.getSettings().deviceId ?? deviceId ?? null);
         setStatus("connected");
@@ -71,5 +77,5 @@ export function useDeviceCapture(): DeviceCaptureControls {
     [refreshDevices],
   );
 
-  return { videoRef, devices, selectedDeviceId, status, error, refreshDevices, connect, disconnect };
+  return { videoRef, stream, devices, selectedDeviceId, status, error, refreshDevices, connect, disconnect };
 }

@@ -9,6 +9,7 @@ import { SettingsView } from './features/capture/SettingsView';
 import { TrackerDataProvider } from './features/tracker-data/TrackerDataContext';
 import { FriendsProvider } from './features/friends/FriendsContext';
 import { LocalPlayerReporter } from './features/friends/LocalPlayerReporter';
+import { DeviceCaptureProvider } from './features/capture/DeviceCaptureContext';
 import type { NavKey, ViewMode } from './types';
 
 const placeholders: Partial<Record<NavKey, { icon: typeof Gamepad2; title: string; description: string }>> = {
@@ -32,18 +33,20 @@ function App() {
   return (
     <TrackerDataProvider>
       <FriendsProvider>
-        <LocalPlayerReporter />
-        <AppShell active={active} onSelect={setActive} viewMode={viewMode} onViewModeChange={setViewMode}>
-          {active === 'live' ? (
-            <LiveDashboardRouter />
-          ) : active === 'otAnalytics' ? (
-            <OtAnalyticsView />
-          ) : active === 'settings' ? (
-            <SettingsView />
-          ) : placeholder ? (
-            <PlaceholderView icon={placeholder.icon} title={placeholder.title} description={placeholder.description} />
-          ) : null}
-        </AppShell>
+        <DeviceCaptureProvider>
+          <LocalPlayerReporter />
+          <AppShell active={active} onSelect={setActive} viewMode={viewMode} onViewModeChange={setViewMode}>
+            {active === 'live' ? (
+              <LiveDashboardRouter />
+            ) : active === 'otAnalytics' ? (
+              <OtAnalyticsView />
+            ) : active === 'settings' ? (
+              <SettingsView />
+            ) : placeholder ? (
+              <PlaceholderView icon={placeholder.icon} title={placeholder.title} description={placeholder.description} />
+            ) : null}
+          </AppShell>
+        </DeviceCaptureProvider>
       </FriendsProvider>
     </TrackerDataProvider>
   );

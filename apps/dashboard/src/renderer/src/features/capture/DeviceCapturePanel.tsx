@@ -1,14 +1,26 @@
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { Video, VideoOff } from 'lucide-react';
-import { useDeviceCapture } from './useDeviceCapture';
-import { useLiveTracking } from './useLiveTracking';
+import { useDeviceCaptureContext } from './DeviceCaptureContext';
 import { useTrackerDataContext } from '../tracker-data/TrackerDataContext';
 import { Card, SectionHeader } from '../../components/ui/Card';
 import { StatusIndicator } from '../../components/ui/StatusIndicator';
 
+/** A second <video> pointed at the same stream as DeviceCaptureContext's own
+ * (hidden, always-mounted) one - just for display here, not decoded for capture. */
+function StreamPreview({ stream }: { stream: MediaStream | null }) {
+  const ref = useRef<HTMLVideoElement>(null);
+
+  useEffect(() => {
+    if (!ref.current) return;
+    ref.current.srcObject = stream;
+    if (stream) ref.current.play().catch(() => {});
+  }, [stream]);
+
+  return <video ref={ref} muted playsInline className="size-full object-cover" />;
+}
+
 export function DeviceCapturePanel() {
-  const capture = useDeviceCapture();
-  const tracking = useLiveTracking(capture.videoRef);
+  const { tracking, ...capture } = useDeviceCaptureContext();
   const { captureState } = useTrackerDataContext();
 
   useEffect(() => {
@@ -38,7 +50,7 @@ export function DeviceCapturePanel() {
 
       <div className="flex flex-col gap-4 lg:flex-row">
         <div className="relative aspect-video w-full shrink-0 overflow-hidden rounded-inset border border-border-soft bg-background-secondary lg:w-72">
-          <video ref={capture.videoRef} muted playsInline className="size-full object-cover" />
+          <StreamPreview stream={capture.stream} />
           {!connected && (
             <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 text-muted-foreground">
               <VideoOff size={22} />
