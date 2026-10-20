@@ -1,0 +1,26 @@
+#!/usr/bin/env bash
+# Runs automatically after `git pull` (or any merge) brings in new commits -
+# whoever does the pulling (you, Claude, Devin, anyone) sees a plain bullet
+# summary of what just changed, with no extra command to remember.
+#
+# Not committed as an active hook by itself - git only runs hooks from the path
+# named by core.hooksPath, which is a local, per-clone setting. ./update.sh sets
+# it automatically every time it runs, so the first `./update.sh` on a given
+# clone turns this on for all pulls after that, including plain `git pull`.
+set -uo pipefail
+
+# $1 is 1 for a genuine merge, 0 for a fast-forward - both still move HEAD, so
+# both are worth summarizing. ORIG_HEAD is what git pull/merge moved HEAD from.
+PREV="$(git rev-parse ORIG_HEAD 2>/dev/null || true)"
+[[ -n "$PREV" ]] || exit 0
+
+CURR="$(git rev-parse HEAD)"
+[[ "$PREV" != "$CURR" ]] || exit 0
+
+COMMITS="$(git log --reverse --format='- %s' "$PREV..$CURR" 2>/dev/null)"
+[[ -n "$COMMITS" ]] || exit 0
+
+echo
+echo "Pulled $(echo "$COMMITS" | wc -l | tr -d ' ') new commit(s):"
+echo "$COMMITS"
+echo

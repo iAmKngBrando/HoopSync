@@ -49,6 +49,13 @@ restart HoopSync rather than just reloading a window — main-process/preload co
 either Electron app only loads once when that app starts, so a page refresh alone
 keeps running the old version.
 
+The first run of `update.sh` on a given clone also turns on `.githooks/post-merge`,
+which prints a plain bullet summary of whatever commits a pull just brought in —
+after that it fires on *any* `git pull` in that clone, not just through this script
+(so it covers a co-dev's agent/tool pulling directly too, as long as it's pulling in
+a clone where `update.sh` has run at least once). To turn it on without running
+`update.sh` first: `git config core.hooksPath .githooks`.
+
 ### Running everything
 
 ```bash

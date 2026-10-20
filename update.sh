@@ -18,6 +18,18 @@ die() { printf '\033[31mError:\033[0m %s\n' "$*" >&2; exit 1; }
 
 cd "$ROOT"
 
+# Turns on .githooks/post-merge - a bullet summary of newly pulled commits,
+# printed automatically after this pull and every plain `git pull` after it.
+# core.hooksPath is a local, per-clone git setting (not something a commit can
+# turn on by itself), so this is what actually switches it on - skipped if
+# something else already owns core.hooksPath, rather than overwriting it.
+CURRENT_HOOKS_PATH="$(git config --get core.hooksPath || true)"
+if [[ -z "$CURRENT_HOOKS_PATH" ]]; then
+  git config core.hooksPath .githooks
+elif [[ "$CURRENT_HOOKS_PATH" != ".githooks" && "$CURRENT_HOOKS_PATH" != "$ROOT/.githooks" ]]; then
+  echo "Note: core.hooksPath is already \"$CURRENT_HOOKS_PATH\" - leaving it alone, so the pull-summary hook (.githooks/post-merge) won't run automatically here."
+fi
+
 echo "Pulling latest changes..."
 git pull || die "git pull failed - resolve that first (conflicts, uncommitted changes, etc.)."
 
