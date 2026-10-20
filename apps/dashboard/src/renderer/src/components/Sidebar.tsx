@@ -1,18 +1,17 @@
 import {
   Activity,
-  Gamepad2,
   LayoutGrid,
   LineChart,
   Settings,
   Trophy,
-  Users,
   Video,
 } from 'lucide-react';
 import { cn } from '../utils/cn';
 import type { NavKey } from '../types';
-import { StatusIndicator, type ConnectionState } from './ui/StatusIndicator';
+import { StatusIndicator } from './ui/StatusIndicator';
 import { useTrackerDataContext } from '../features/tracker-data/TrackerDataContext';
 import { formatRelativeTime } from '../features/tracker-data/format';
+import { captureStatus } from '../features/tracker-data/captureStatus';
 
 interface NavItem {
   key: NavKey;
@@ -20,34 +19,22 @@ interface NavItem {
   icon: typeof Activity;
 }
 
+// "Games" and "Players" were retired as separate nav items - OT Analytics' own
+// game history and opponent list already cover that ground (a dedicated "Players"
+// page belongs to squad rosters specifically, which don't exist until squad
+// detection does - see the product brief's deferred squad-detection work).
 const navItems: NavItem[] = [
   { key: 'live', label: 'Live Dashboard', icon: Activity },
-  { key: 'games', label: 'Games', icon: Gamepad2 },
-  { key: 'players', label: 'Players', icon: Users },
+  { key: 'otAnalytics', label: 'OT Analytics', icon: LineChart },
   { key: 'leaderboards', label: 'Leaderboards', icon: Trophy },
   { key: 'teamStats', label: 'Team Stats', icon: LayoutGrid },
   { key: 'clips', label: 'Clips', icon: Video },
-  { key: 'otAnalytics', label: 'OT Analytics', icon: LineChart },
   { key: 'settings', label: 'Settings', icon: Settings },
 ];
 
 interface SidebarProps {
   active: NavKey;
   onSelect: (key: NavKey) => void;
-}
-
-/** Maps the server's reported capture/connection state to a status pill. */
-function captureStatus(
-  connection: 'loading' | 'online' | 'offline',
-  captureState: 'connected' | 'recording' | 'processing' | 'idle' | 'disconnected',
-): { state: ConnectionState; label: string } {
-  if (connection === 'loading') return { state: 'disconnected', label: 'Checking…' };
-  if (connection === 'offline') return { state: 'disconnected', label: 'Server offline' };
-  if (captureState === 'recording' || captureState === 'processing') {
-    return { state: 'live', label: 'Live' };
-  }
-  if (captureState === 'connected') return { state: 'connected', label: 'Connected' };
-  return { state: 'disconnected', label: 'No capture' };
 }
 
 export function Sidebar({ active, onSelect }: SidebarProps) {

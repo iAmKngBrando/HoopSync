@@ -2,8 +2,6 @@ export type ViewMode = 'full' | 'minimal';
 
 export type NavKey =
   | 'live'
-  | 'games'
-  | 'players'
   | 'leaderboards'
   | 'teamStats'
   | 'clips'
