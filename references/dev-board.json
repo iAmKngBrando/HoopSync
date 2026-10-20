@@ -184,5 +184,19 @@
     "column": "todo",
     "author": "Brando",
     "createdAt": "2026-10-20T16:06:35.998Z"
+  },
+  {
+    "id": "8204afd4-9562-4579-be78-4a6ce5715a84",
+    "title": "Allow for config to fix/float scoreboard",
+    "column": "todo",
+    "author": "Brando",
+    "createdAt": "2026-10-20T16:15:36.251Z"
+  },
+  {
+    "id": "afd2cc7e-145c-4773-ad36-753c2fd3ffc2",
+    "title": "Connect CurrentGame card and GameResult card",
+    "column": "todo",
+    "author": "Brando",
+    "createdAt": "2026-10-20T16:15:56.238Z"
   }
 ]
