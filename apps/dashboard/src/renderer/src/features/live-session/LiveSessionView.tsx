@@ -22,6 +22,12 @@
 // during most of a live game neither applies - collapsed into one slot that
 // takes the full row when relevant and disappears rather than wasting half a
 // row on two empty cards most of the time.
+//
+// LiveScoreboard is also sticky (stays pinned to the top of the scroll area),
+// so the score is still visible after scrolling down to Game History or
+// Connected Friends mid-game - the ".glass" card style it already has gives
+// it a real (blurred, not transparent) background to sit over scrolled
+// content, so this needed no extra styling beyond "sticky top-0".
 
 import { useTrackerDataContext } from '../tracker-data/TrackerDataContext';
 import { useFriendsRoster } from '../friends/useFriendsRoster';
@@ -71,7 +77,7 @@ export function LiveSessionView() {
       {friends.enabled && friends.players.length > 0 && <PlayerStatCards players={friends.players} />}
 
       <div className="grid grid-cols-1 gap-4 xl:grid-cols-12">
-        <Card className="xl:col-span-8">
+        <Card className="sticky top-0 z-10 xl:col-span-8">
           <SectionHeader title="LIVE SCOREBOARD" live={isLive} />
           <LiveScoreboard
             myScore={game?.yourScore ?? 0}
