@@ -176,5 +176,13 @@
     "column": "todo",
     "author": "Brando",
     "createdAt": "2026-10-20T16:04:11.857Z"
+  },
+  {
+    "id": "23e31200-1489-4e3f-910e-85e2e08940f1",
+    "title": "Add 'Create a clip' feature",
+    "note": "Can app detect this or do we have to do this manually",
+    "column": "todo",
+    "author": "Brando",
+    "createdAt": "2026-10-20T16:06:35.998Z"
   }
 ]
