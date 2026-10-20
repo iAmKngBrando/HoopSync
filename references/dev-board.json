@@ -114,5 +114,51 @@
     "tag": "nice-to-have",
     "author": "Brando",
     "createdAt": "2026-10-20T03:47:36.579Z"
+  },
+  {
+    "id": "44fb5290-faca-4791-a45b-402c5689dc71",
+    "title": "Add quick stats card to dashboard",
+    "note": "- From the In_game frames, if stat box is present, then update.",
+    "column": "todo",
+    "author": "Brando",
+    "createdAt": "2026-10-20T15:45:49.736Z"
+  },
+  {
+    "id": "99b99464-6c67-41d0-ba25-0ce404a14c9d",
+    "title": "Complete 'Profile' selection in upper right corner",
+    "column": "todo",
+    "author": "Brando",
+    "createdAt": "2026-10-20T15:47:07.980Z"
+  },
+  {
+    "id": "46b9fcd7-0c58-4a3d-b09e-4b62201a5560",
+    "title": "Assess and complete/remove Notification bell (upper right corner)",
+    "column": "todo",
+    "author": "Brando",
+    "createdAt": "2026-10-20T15:48:11.067Z"
+  },
+  {
+    "id": "e75fb145-e610-4b4e-887e-6b5c69d28eb4",
+    "title": "Add ability to record and export game from dashboard",
+    "column": "todo",
+    "author": "Brando",
+    "createdAt": "2026-10-20T15:52:28.622Z"
+  },
+  {
+    "id": "b7688a16-36a3-40fe-b99f-2ccb6b1396d3",
+    "title": "Update hoopsync.app",
+    "note": "- Only make HoopSync open when we click the app icon and not the capture tool.",
+    "column": "todo",
+    "author": "Brando",
+    "createdAt": "2026-10-20T15:54:02.018Z"
+  },
+  {
+    "id": "d4f8c1a3-7e5b-4a2d-9c6f-3b8e1a4d5c92",
+    "title": "Make the Live Scoreboard sticky while scrolling",
+    "note": "So the score stays visible even when scrolling down mid-game to check Game History or Connected Friends. More engineering complexity than the reorder it followed (LiveScoreboard already moved to the top of the Live Dashboard) - a real follow-up, not bundled into that pass.",
+    "column": "todo",
+    "tag": "nice-to-have",
+    "author": "Brando",
+    "createdAt": "2026-10-20T15:58:37.799Z"
   }
 ]
