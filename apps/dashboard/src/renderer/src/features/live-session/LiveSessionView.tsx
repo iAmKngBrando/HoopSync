@@ -4,10 +4,13 @@
 // the ported 2kOT pipeline doesn't do yet — see the product brief's §34b
 // "Deferred / Future To-Dos".
 //
-// Game History / Quick Stats / Recent Opponents live under OT Analytics now
-// (same data, so showing them here too would just duplicate that tab) -
-// Live Scoreboard, Session History and Connected Friends take their place,
-// brought back from the original squad dashboard.
+// Quick Stats / Recent Opponents live under OT Analytics now (same data, so
+// showing them here too would just duplicate that tab) - Live Scoreboard and
+// Connected Friends take their place, brought back from the original squad
+// dashboard. Recent games reuses OT Analytics' own GameHistoryTable (limited
+// to a handful of rows) rather than SessionHistoryPanel, which is squad-shaped
+// (a "players" roster per row) and still sample-only for that reason - see
+// DashboardView's Squad Preview, the one place it's still correct to use.
 
 import { useTrackerDataContext } from '../tracker-data/TrackerDataContext';
 import { useFriendsRoster } from '../friends/useFriendsRoster';
@@ -15,12 +18,12 @@ import { CurrentGameCard } from './CurrentGameCard';
 import { MatchupPreviewCard } from './MatchupPreviewCard';
 import { EndGameResultCard } from './EndGameResultCard';
 import { OpponentQuickStats } from '../ot-analytics/OpponentQuickStats';
+import { GameHistoryTable } from '../ot-analytics/GameHistoryTable';
 import { LiveScoreboard } from '../../components/LiveScoreboard';
-import { SessionHistoryPanel } from '../../components/SessionHistoryPanel';
 import { ConnectedFriendsPanel } from '../../components/ConnectedFriendsPanel';
 import { PlayerStatCards } from '../../components/PlayerStatCards';
 import { Card, SectionHeader } from '../../components/ui/Card';
-import { sessionHistory, connectedFriends as sampleConnectedFriends } from '../../data/mockData';
+import { connectedFriends as sampleConnectedFriends } from '../../data/mockData';
 import { ServerOff } from 'lucide-react';
 
 export function LiveSessionView() {
@@ -73,7 +76,7 @@ export function LiveSessionView() {
         <EndGameResultCard result={dashboard.endGame} className="xl:col-span-6" />
         <MatchupPreviewCard matchup={dashboard.nextMatchup} className="xl:col-span-6" />
 
-        <SessionHistoryPanel sessions={sessionHistory} className="xl:col-span-8" />
+        <GameHistoryTable games={dashboard.history} limit={5} className="xl:col-span-8" />
         <ConnectedFriendsPanel
           friends={friends.enabled ? friends.connectedFriends : sampleConnectedFriends}
           className="xl:col-span-4"

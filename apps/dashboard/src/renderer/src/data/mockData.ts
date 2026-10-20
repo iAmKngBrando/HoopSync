@@ -15,14 +15,6 @@ export const topPlayerCards: PlayerSummary[] = [
   { id: 'p4', name: 'AirBuckets', position: 'P4', avatarColor: '#f97316', live: true, pts: 9, reb: 6, ast: 2 },
 ];
 
-export const minimalRosterCards: PlayerSummary[] = [
-  ...topPlayerCards,
-  { id: 'o1', name: 'IsoKing', position: 'OPP', avatarColor: '#64748b', live: true, pts: 17, reb: 2, ast: 3 },
-  { id: 'o2', name: 'Hooper24', position: 'OPP', avatarColor: '#64748b', live: true, pts: 14, reb: 6, ast: 5 },
-  { id: 'o3', name: 'GreenMachine', position: 'OPP', avatarColor: '#64748b', live: true, pts: 11, reb: 4, ast: 2 },
-  { id: 'o4', name: 'PostUpLegend', position: 'OPP', avatarColor: '#64748b', live: true, pts: 6, reb: 5, ast: 1 },
-];
-
 export const myTeamBoxScore: BoxScoreRow[] = [
   { id: 'p1', name: 'Brando', pts: 24, reb: 8, ast: 6, stl: 1, blk: 0, fgMade: 9, fgAtt: 12, tpMade: 6, tpAtt: 7, to: 1, plusMinus: 15, highlight: true },
   { id: 'p2', name: 'JaySmooth', pts: 18, reb: 3, ast: 7, stl: 0, blk: 0, fgMade: 7, fgAtt: 11, tpMade: 4, tpAtt: 6, to: 0, plusMinus: 11 },

@@ -21,29 +21,32 @@ const placeholders: Partial<Record<NavKey, { icon: typeof Trophy; title: string;
 function App() {
   const [active, setActive] = useState<NavKey>('live');
   const [viewMode, setViewMode] = useState<ViewMode>('full');
-
-  if (viewMode === 'minimal') {
-    return <MinimalDashboard onViewModeChange={setViewMode} />;
-  }
-
   const placeholder = placeholders[active];
 
+  // TrackerData/Friends/DeviceCapture all wrap both view modes, not just the full
+  // AppShell - switching to Minimal used to unmount them entirely (killing the live
+  // capture connection and friends connection along with it), the same bug class as
+  // DeviceCaptureContext fixed for Settings/Live Dashboard, just for every provider.
   return (
     <TrackerDataProvider>
       <FriendsProvider>
         <DeviceCaptureProvider>
           <LocalPlayerReporter />
-          <AppShell active={active} onSelect={setActive} viewMode={viewMode} onViewModeChange={setViewMode}>
-            {active === 'live' ? (
-              <LiveDashboardRouter />
-            ) : active === 'otAnalytics' ? (
-              <OtAnalyticsView />
-            ) : active === 'settings' ? (
-              <SettingsView />
-            ) : placeholder ? (
-              <PlaceholderView icon={placeholder.icon} title={placeholder.title} description={placeholder.description} />
-            ) : null}
-          </AppShell>
+          {viewMode === 'minimal' ? (
+            <MinimalDashboard onViewModeChange={setViewMode} />
+          ) : (
+            <AppShell active={active} onSelect={setActive} viewMode={viewMode} onViewModeChange={setViewMode}>
+              {active === 'live' ? (
+                <LiveDashboardRouter />
+              ) : active === 'otAnalytics' ? (
+                <OtAnalyticsView />
+              ) : active === 'settings' ? (
+                <SettingsView />
+              ) : placeholder ? (
+                <PlaceholderView icon={placeholder.icon} title={placeholder.title} description={placeholder.description} />
+              ) : null}
+            </AppShell>
+          )}
         </DeviceCaptureProvider>
       </FriendsProvider>
     </TrackerDataProvider>
