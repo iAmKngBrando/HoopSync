@@ -11,6 +11,17 @@
 // to a handful of rows) rather than SessionHistoryPanel, which is squad-shaped
 // (a "players" roster per row) and still sample-only for that reason - see
 // DashboardView's Squad Preview, the one place it's still correct to use.
+//
+// Layout: the big score is the highest-frequency glance during live play, so
+// LiveScoreboard leads, ahead of the CurrentGameCard matchup visual (which
+// only matters once per game, not every few seconds) - CurrentGameCard's own
+// status pill was trimmed to just the game state for the same reason, since
+// repeating the score/clock there would just be the same numbers twice.
+// EndGameResultCard and MatchupPreviewCard are mutually exclusive in practice
+// (never both "just finished" and "waiting on next matchup" at once), and
+// during most of a live game neither applies - collapsed into one slot that
+// takes the full row when relevant and disappears rather than wasting half a
+// row on two empty cards most of the time.
 
 import { useTrackerDataContext } from '../tracker-data/TrackerDataContext';
 import { useFriendsRoster } from '../friends/useFriendsRoster';
@@ -60,10 +71,7 @@ export function LiveSessionView() {
       {friends.enabled && friends.players.length > 0 && <PlayerStatCards players={friends.players} />}
 
       <div className="grid grid-cols-1 gap-4 xl:grid-cols-12">
-        <CurrentGameCard game={game} className="xl:col-span-8" />
-        <OpponentQuickStats opponent={dashboard.focusOpponent} className="xl:col-span-4" />
-
-        <Card className="xl:col-span-12">
+        <Card className="xl:col-span-8">
           <SectionHeader title="LIVE SCOREBOARD" live={isLive} />
           <LiveScoreboard
             myScore={game?.yourScore ?? 0}
@@ -72,9 +80,15 @@ export function LiveSessionView() {
             clock={game?.clock}
           />
         </Card>
+        <OpponentQuickStats opponent={dashboard.focusOpponent} className="xl:col-span-4" />
 
-        <EndGameResultCard result={dashboard.endGame} className="xl:col-span-6" />
-        <MatchupPreviewCard matchup={dashboard.nextMatchup} className="xl:col-span-6" />
+        <CurrentGameCard game={game} className="xl:col-span-12" />
+
+        {dashboard.nextMatchup ? (
+          <MatchupPreviewCard matchup={dashboard.nextMatchup} className="xl:col-span-12" />
+        ) : (
+          dashboard.endGame && <EndGameResultCard result={dashboard.endGame} className="xl:col-span-12" />
+        )}
 
         <GameHistoryTable games={dashboard.history} limit={5} className="xl:col-span-8" />
         <ConnectedFriendsPanel

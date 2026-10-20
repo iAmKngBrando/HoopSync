@@ -23,10 +23,8 @@ interface CurrentGameCardProps {
 }
 
 export function CurrentGameCard({ game, className }: CurrentGameCardProps) {
-  const hasScore = game?.yourScore !== undefined && game?.opponentScore !== undefined;
   // A real captured matchup frame already shows both players; don't draw over it.
   const hasImage = Boolean(game?.frame?.imageUrl);
-  const hasClock = game?.quarter !== undefined || game?.clock !== undefined;
 
   return (
     <Card label="Current game" className={className}>
@@ -72,9 +70,10 @@ export function CurrentGameCard({ game, className }: CurrentGameCardProps) {
           </div>
         )}
 
-        {/* Status bar: game state, quarter and clock */}
+        {/* Status bar: just the game state - score/clock live in LiveScoreboard,
+            right above this card, so repeating them here would just be noise. */}
         <div className="absolute inset-x-0 bottom-3 flex justify-center px-3">
-          <div className="flex items-center divide-x divide-border-soft rounded-full border border-border bg-background/75 text-sm backdrop-blur-sm">
+          <div className="flex items-center rounded-full border border-border bg-background/75 text-sm backdrop-blur-sm">
             <span
               className={cn(
                 'px-4 py-1.5 text-xs font-semibold',
@@ -83,23 +82,6 @@ export function CurrentGameCard({ game, className }: CurrentGameCardProps) {
             >
               {game ? statusLabels[game.status] : 'No game detected'}
             </span>
-            {hasScore && (
-              <span
-                className="px-4 py-1.5 font-semibold tabular-nums text-foreground"
-                aria-label={`You ${game.yourScore}, opponent ${game.opponentScore}`}
-              >
-                <span className="mr-1.5 text-xs font-medium text-foreground-secondary">You</span>
-                <span className="text-primary">{game.yourScore}</span>
-                <span className="mx-1.5 text-muted-foreground">-</span>
-                <span className="text-accent-blue">{game.opponentScore}</span>
-              </span>
-            )}
-            {(hasClock || !hasScore) && (
-              <span className="flex items-center gap-2 px-4 py-1.5 font-semibold tabular-nums text-foreground">
-                <span>{game?.quarter ? `Q${game.quarter}` : 'Q–'}</span>
-                <span>{game?.clock ?? '--:--'}</span>
-              </span>
-            )}
           </div>
         </div>
       </ScreenshotFrame>
