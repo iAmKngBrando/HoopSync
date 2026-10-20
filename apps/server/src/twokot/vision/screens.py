@@ -184,8 +184,11 @@ def _clean_build(text: str) -> str | None:
 
 def _clean_gamertag(text: str) -> str | None:
     # Platform icons in front of the name are often read as a stray character.
+    # Most gamertags are one word ("iAmKngBrando"), but display names with
+    # spaces are real too ("El Don Bass") - capped at 3 words/20 chars so a
+    # stray multi-word UI label landing in the same band isn't mistaken for one.
     name = parse.clean_name(text)
-    if not name or " " in name or len(name) < 3:
+    if not name or len(name) < 3 or len(name) > 20 or len(name.split()) > 3:
         return None
     return name
 

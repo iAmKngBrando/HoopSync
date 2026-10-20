@@ -38,6 +38,19 @@ def test_matchup_screen_values(reader):
         assert obs.mode == "City Games"
 
 
+def test_matchup_screen_values_proving_grounds(reader):
+    """Same template as City Games/Theater - only the mode text differs - except one
+    real gap this specifically exercises: a gamertag with spaces in it ("El Don Bass"),
+    which _clean_gamertag used to reject outright, dropping the whole name."""
+    obs = analyze("pg_matchup_01", reader)
+    assert obs.mode == "Proving Grounds"
+    assert (obs.left.name, obs.left.overall, obs.left.position) == ("El Don Bass", 99, "SF")
+    assert obs.left.build == "2-Way Bucket Chaser"
+    # Stylized repeated I/l characters in the gamertag ("III") are a known OCR
+    # ambiguity - this is the pipeline's actual (imperfect) reading, not the real tag.
+    assert obs.right.name == "I/lCxmpxZenlll"
+
+
 def test_player_card_names(reader):
     assert analyze("0045", reader).player.name == "iAmKngBrando"
     assert analyze("0048", reader).player.overall == 98

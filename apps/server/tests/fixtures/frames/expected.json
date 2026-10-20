@@ -24,5 +24,6 @@
   "hd_0033": "opponent_player_load_screen",
   "hd_0045": "player_matchup",
   "hd_0300": "in_game",
-  "hd_0611": "game_result"
+  "hd_0611": "game_result",
+  "pg_matchup_01": "player_matchup"
 }
