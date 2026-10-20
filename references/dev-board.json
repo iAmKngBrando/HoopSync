@@ -2,8 +2,8 @@
   {
     "id": "seed-1",
     "title": "Recalibrate vision pipeline for Proving Grounds / City Games 1v1",
-    "note": "Pipeline is calibrated for 1v1 Theater; the mode we actually play isn't detected at all. Use session-recordings/668fecdd... as reference frames.",
-    "column": "todo",
+    "note": "Done for 1v1 Theater + Proving Grounds: matchup screen (100% on both, including a gamertag-with-spaces extraction bug fix), YOU/OPPONENT load-in cards (100% both locations), and a new load_screen pregame trigger (Theater lobby only - Proving Grounds has no confirmed working signal yet, its title card isn't OCR-detectable). Squad (2v2/3v3/5v5) detection still not done - see the squad-detection card.",
+    "column": "done",
     "tag": "core",
     "createdAt": "2026-10-15T12:00:00.000Z"
   },
@@ -75,7 +75,7 @@
   {
     "id": "f375db46-e480-47a2-8066-8c0184ba8e98",
     "title": "Create tag for Proving Grounds Player Matchup",
-    "column": "todo",
+    "column": "done",
     "tag": "core",
     "author": "Brando",
     "createdAt": "2026-10-16T04:43:46.713Z"
@@ -101,7 +101,7 @@
     "id": "a3f1c8e2-6b4d-4e9a-9c1f-7d2e5b8a3c6f",
     "title": "Retag the 7 old player_matchup examples by location",
     "note": "player_matchup was removed as a tag in favor of location-specific ones (proving_grounds_player_matchup, theater_player_matchup, ...). The 7 examples still labeled plain \"player_matchup\" in capture-samples/ need to be moved to the right location tag before they're used for training.",
-    "column": "todo",
+    "column": "done",
     "tag": "core",
     "createdAt": "2026-10-19T00:00:00.000Z"
   }
