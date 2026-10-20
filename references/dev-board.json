@@ -33,9 +33,10 @@
   {
     "id": "seed-5",
     "title": "Remove remaining mock/sample data fallbacks",
-    "column": "todo",
+    "column": "done",
     "tag": "cleanup",
-    "createdAt": "2026-10-15T12:00:00.000Z"
+    "createdAt": "2026-10-15T12:00:00.000Z",
+    "note": "Done: Live Dashboard Session History (now reuses OT Analytics own GameHistoryTable, real games), MinimalDashboard (real score/opponent/capture status), and TopBar (real live/opponent/friend-count, fake notification badge and running timer removed) all stopped showing permanent fake data. Also retired the Games/Players sidebar nav items - OT Analytics already covers both. What is left showing sample data is intentionally so and already labeled (DashboardView/SessionHistoryPanel Squad Preview, friends fallback) - correct until squad detection exists, not a bug."
   },
   {
     "id": "seed-6",
@@ -104,5 +105,14 @@
     "column": "done",
     "tag": "core",
     "createdAt": "2026-10-19T00:00:00.000Z"
+  },
+  {
+    "id": "c7e2a9f4-1b6d-4e3a-8f0c-5d9a2b7e6c13",
+    "title": "Build a badge-requirement calculator from attributes",
+    "note": "Feeds the \"AI recommendation convos\" card. Checked: no need to tap a third-party app's API - badge thresholds (bronze/silver/gold/HOF/legend per attribute level) are deterministic game data, already visible in-game and documented community-wide. Better path: source the actual NBA 2K26 table ourselves and build the lookup directly into HoopSync, using the Player Card OCR we already have as input.",
+    "column": "todo",
+    "tag": "nice-to-have",
+    "author": "Brando",
+    "createdAt": "2026-10-20T03:47:36.579Z"
   }
 ]
