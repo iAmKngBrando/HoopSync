@@ -1,5 +1,5 @@
 import { join } from "node:path";
-import { app, BrowserWindow, ipcMain, session, shell, systemPreferences } from "electron";
+import { app, BrowserWindow, ipcMain, powerSaveBlocker, session, shell, systemPreferences } from "electron";
 import { addCard, addTag, deleteCard, deleteTag, listBoard, listTags, moveCard, renameTag, type BoardColumn } from "./devBoard";
 
 const CAMERA_PRIVACY_SETTINGS_URL = "x-apple.systempreferences:com.apple.preference.security?Privacy_Camera";
@@ -25,6 +25,10 @@ function createWindow(): void {
     webPreferences: {
       preload: join(__dirname, "../preload/index.mjs"),
       sandbox: false,
+      // See apps/capture/src/main/index.ts's comment on this same setting - this
+      // window's own live-tracking capture is subject to the identical background
+      // throttling issue while it sits unfocused during a real game.
+      backgroundThrottling: false,
     },
   });
 
@@ -45,6 +49,11 @@ function createWindow(): void {
 }
 
 app.whenReady().then(() => {
+  // See apps/capture/src/main/index.ts's comment on this call - backgroundThrottling
+  // alone doesn't stop macOS App Nap from suspending this window's background work
+  // (its own live-tracking capture) while it sits unfocused during a real game.
+  powerSaveBlocker.start("prevent-app-suspension");
+
   // Same reasoning as apps/capture: auto-approve the Elgato/webcam permission
   // prompt at the Electron/Chromium level (this is a single-purpose app, not
   // a general browser), and separately prime the macOS camera TCC dialog

@@ -1,5 +1,5 @@
 import { join } from "node:path";
-import { app, BrowserWindow, ipcMain, session, shell, systemPreferences } from "electron";
+import { app, BrowserWindow, ipcMain, powerSaveBlocker, session, shell, systemPreferences } from "electron";
 import {
   deleteDatasetExample,
   listDatasetExamples,
@@ -50,6 +50,14 @@ function createWindow(): void {
     webPreferences: {
       preload: join(__dirname, "../preload/index.js"),
       sandbox: false,
+      // Live tracking posts frames on a setInterval while this window sits in the
+      // background (you're looking at the game, not this app) - Electron inherits
+      // Chromium's background-tab throttling by default, which clamps timers in an
+      // occluded window down to ~once a minute after a couple of minutes. That's
+      // the exact "live tracking disconnects after a couple minutes" symptom this
+      // app was made Electron to avoid in the first place - avoiding it needs this
+      // explicit opt-out, moving off Safari alone didn't do it.
+      backgroundThrottling: false,
     },
   });
 
@@ -70,6 +78,14 @@ function createWindow(): void {
 }
 
 app.whenReady().then(() => {
+  // webPreferences.backgroundThrottling only stops Chromium's own page-visibility
+  // timer throttling; it does nothing about macOS App Nap, a separate OS-level
+  // mechanism that can still suspend a backgrounded app's background work (exactly
+  // what happens here: this window sits unfocused the whole time a real game is being
+  // played). This is the dedicated opt-out for that - same category as a download
+  // manager or music player staying active while backgrounded.
+  powerSaveBlocker.start("prevent-app-suspension");
+
   // HoopSync capture is a single-purpose local app (not a general browser), so the
   // Elgato/webcam permission prompt is auto-approved at the Electron/Chromium level
   // rather than shown per-origin. On macOS this alone does NOT trigger the OS-level
