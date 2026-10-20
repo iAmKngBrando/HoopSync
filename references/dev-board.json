@@ -156,9 +156,25 @@
     "id": "d4f8c1a3-7e5b-4a2d-9c6f-3b8e1a4d5c92",
     "title": "Make the Live Scoreboard sticky while scrolling",
     "note": "So the score stays visible even when scrolling down mid-game to check Game History or Connected Friends. More engineering complexity than the reorder it followed (LiveScoreboard already moved to the top of the Live Dashboard) - a real follow-up, not bundled into that pass.",
-    "column": "todo",
+    "column": "done",
     "tag": "nice-to-have",
     "author": "Brando",
     "createdAt": "2026-10-20T15:58:37.799Z"
+  },
+  {
+    "id": "50460f01-93ba-4eb8-b042-0af94c3e4425",
+    "title": "Make cards movable and resizable",
+    "note": "Maybe add a note for ai to check that this doesn't structurally effect the code",
+    "column": "todo",
+    "author": "Brando",
+    "createdAt": "2026-10-20T16:01:57.125Z"
+  },
+  {
+    "id": "2170bf9d-502f-4250-881d-cde5f38d16fb",
+    "title": "Detect different builds",
+    "note": "Make sure builds are attached to gamertag",
+    "column": "todo",
+    "author": "Brando",
+    "createdAt": "2026-10-20T16:04:11.857Z"
   }
 ]
