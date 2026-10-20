@@ -18,23 +18,20 @@ export interface ScreenTag {
  * (lowercase, not HoopSync's older SCREAMING_CASE style) so a labeled dataset can be
  * compared directly against fixture expected.json files.
  *
- * One deliberate exception: there's no single "player_matchup" tag. The matchup screen's
- * exact layout may differ per location/setting (Proving Grounds, Theater, Rec, ...), so
- * labeling starts split by location (see the location-specific *_player_matchup tags
- * added via the UI) even though classify() still only emits one generic ScreenKind.MATCHUP
- * today - splitting the data now means it's ready whenever that becomes per-location too.
+ * Two deliberate exceptions, dropped since the matchup screen alone already carries
+ * both players' identity (name, overall, build - see test_matchup_screen_values), making
+ * the separate "YOU"/"OPPONENT" load-in cards redundant as their own tracked category:
+ * my_player_load_screen and opponent_player_load_screen (mirrors ScreenKind.MY_PLAYER/
+ * OPPONENT_PLAYER) aren't tags here, even though classify()/PREGAME_SCREENS still
+ * recognizes those screens in apps/server - that's unaffected by what gets labeled.
+ *
+ * And there's no single "player_matchup" tag. The matchup screen's exact layout may
+ * differ per location/setting (Proving Grounds, Theater, Rec, ...), so labeling starts
+ * split by location (see the location-specific *_player_matchup tags added via the UI)
+ * even though classify() still only emits one generic ScreenKind.MATCHUP today -
+ * splitting the data now means it's ready whenever that becomes per-location too.
  */
 const DEFAULT_TAGS: ScreenTag[] = [
-  {
-    name: "my_player_load_screen",
-    description: "Your MyPlayer card during pre-game load-in (name, overall, level, build).",
-    builtin: true,
-  },
-  {
-    name: "opponent_player_load_screen",
-    description: "Opponent's MyPlayer card during pre-game load-in.",
-    builtin: true,
-  },
   {
     name: "in_game",
     description: "Live gameplay - the persistent scoreboard (and shot-meter box) are on screen and readable.",
