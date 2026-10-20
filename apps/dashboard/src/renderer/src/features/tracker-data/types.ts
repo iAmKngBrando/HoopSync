@@ -131,6 +131,15 @@ export interface GameHistoryRow {
   recordLosses: number;
 }
 
+/** A past game's captured matchup screen - lets CurrentGameCard step back
+ * through recent opponents instead of only ever showing the live one. */
+export interface MatchupHistoryEntry {
+  id: number;
+  opponentName: string;
+  frameUrl: string;
+  date: string;
+}
+
 export interface OverallStats {
   totalGames: number;
   wins: number;

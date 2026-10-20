@@ -7,6 +7,7 @@ import type {
   DashboardData,
   GameHistoryRow,
   LiveState,
+  MatchupHistoryEntry,
   OpponentSummary,
   OverallStats,
 } from './types';
@@ -70,6 +71,20 @@ export function toHistoryRows(games: Game[], opponents: Opponent[]): GameHistory
       recordLosses: opponent?.losses ?? 0,
     };
   });
+}
+
+export function toMatchupHistory(games: Game[], opponents: Opponent[]): MatchupHistoryEntry[] {
+  const byId = new Map(opponents.map((o) => [o.id, o]));
+
+  return [...games]
+    .sort(byNewest)
+    .map((game): MatchupHistoryEntry | null => {
+      const frameUrl = toServerUrl(game.start_frame_path);
+      return frameUrl
+        ? { id: game.id, opponentName: byId.get(game.opponent_id)?.name ?? 'Unknown', frameUrl, date: game.date }
+        : null;
+    })
+    .filter((entry): entry is MatchupHistoryEntry => entry !== null);
 }
 
 const liveStatus = { pregame: 'upcoming', in_progress: 'live', ended: 'ended' } as const;

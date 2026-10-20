@@ -28,9 +28,18 @@
 // Connected Friends mid-game - the ".glass" card style it already has gives
 // it a real (blurred, not transparent) background to sit over scrolled
 // content, so this needed no extra styling beyond "sticky top-0".
+//
+// CurrentGameCard also takes matchupHistory (derived from the same raw
+// games/opponents this hook already fetches - GameDetailDialog over in OT
+// Analytics already shows these same captured frames, this just surfaces
+// them from the Live Dashboard too), so it has something to step through
+// via its own prev/next arrows instead of only ever showing "Awaiting
+// matchup" when nothing's live.
 
+import { useMemo } from 'react';
 import { useTrackerDataContext } from '../tracker-data/TrackerDataContext';
 import { useFriendsRoster } from '../friends/useFriendsRoster';
+import { toMatchupHistory } from '../tracker-data/mapping';
 import { CurrentGameCard } from './CurrentGameCard';
 import { MatchupPreviewCard } from './MatchupPreviewCard';
 import { EndGameResultCard } from './EndGameResultCard';
@@ -44,8 +53,9 @@ import { connectedFriends as sampleConnectedFriends } from '../../data/mockData'
 import { ServerOff } from 'lucide-react';
 
 export function LiveSessionView() {
-  const { dashboard, connection } = useTrackerDataContext();
+  const { dashboard, connection, games, opponents } = useTrackerDataContext();
   const friends = useFriendsRoster();
+  const matchupHistory = useMemo(() => toMatchupHistory(games, opponents), [games, opponents]);
 
   if (connection === 'offline') {
     return (
@@ -88,7 +98,7 @@ export function LiveSessionView() {
         </Card>
         <OpponentQuickStats opponent={dashboard.focusOpponent} className="xl:col-span-4" />
 
-        <CurrentGameCard game={game} className="xl:col-span-12" />
+        <CurrentGameCard game={game} history={matchupHistory} className="xl:col-span-12" />
 
         {dashboard.nextMatchup ? (
           <MatchupPreviewCard matchup={dashboard.nextMatchup} className="xl:col-span-12" />
