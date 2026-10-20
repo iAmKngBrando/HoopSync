@@ -46,6 +46,10 @@ GAME_STATS = box(0.19, 0.18, 0.34, 0.235)  # "GAME STATS"
 SCORE_LEFT = box(0.400, 0.895, 0.452, 0.955)
 SCORE_RIGHT = box(0.532, 0.895, 0.584, 0.955)
 
+# Pre-game load/transition screen: see classify() and _looks_like_load_screen for why
+# only the lobby is checked, not either location's title card.
+LOAD_LOBBY = box(0.65, 0.02, 1.0, 0.09)  # "Waiting For Opponent", top-right of the lobby
+
 # Value regions: read with the find-and-read pass ------------------------------
 
 # "YOU WON" / "YOU LOST" and the score under it. Both animate, and the win
@@ -138,6 +142,9 @@ def classify(frame: np.ndarray, reader: TextReader) -> ScreenKind:
     if _looks_like_result(frame, reader):
         return ScreenKind.GAME_RESULT
 
+    if _looks_like_load_screen(frame, reader):
+        return ScreenKind.LOAD_SCREEN
+
     return ScreenKind.OTHER
 
 
@@ -166,6 +173,38 @@ def _looks_like_result(frame: np.ndarray, reader: TextReader) -> bool:
     if not (0.04 < bright_letters < 0.45 and tinted_backdrop > 0.15):
         return False
     return _result_outcome(_boxes(frame, RESULT_TEXT, reader, scale=0.75)) is not None
+
+
+def _looks_like_load_screen(frame: np.ndarray, reader: TextReader) -> bool:
+    """A pre-game load/transition screen. This isn't one fixed layout - it's a short
+    cinematic (a location title card, then a "waiting for opponent" lobby) with mostly
+    textless frames in between (spinning logo animations), so unlike the signatures
+    above this only needs to catch SOME frames in the sequence, not every one; the
+    state machine only needs a handful of consecutive matches to act on it (see
+    SessionTracker.confirm_frames). Checked last in classify() since it's the most
+    expensive check and only needs to run once nothing else matched.
+
+    Only "Waiting For Opponent" is checked - no title-card text, even though both
+    locations have one (see the *_load_screen dataset tags):
+      - "PROVING GROUNDS" as the big floor logo (pg_load_title_01.jpg) is real, legible
+        on-screen text, but its heavy 3D bevel/embossing isn't detected as text at all
+        by the OCR reader's detection step - not a box/scale tuning problem, it finds
+        zero text regions in the whole frame.
+      - "THE THEATER" title card is detected fine, but 2K reuses the exact same card
+        when entering the Theater *replay* viewer, unrelated to a live match starting
+        (see tests/fixtures/frames/0030.jpg, labeled "other") - nothing distinguishes
+        the two from this card alone.
+      - Both locations' flat, non-stylized "PROVING GROUNDS" jersey/achievement-badge
+        text (worn on load-in player cards, shown on winners_circle, etc.) reads fine
+        on its own, which is exactly the problem: checking for that text anywhere in a
+        wide title-card region caught plenty of frames that were never a load screen
+        at all - a squad "YOUR TEAM" card wearing Proving Grounds jerseys, for one.
+    "Waiting For Opponent" still catches a real Theater pregame sequence - it just
+    does so a step later than the title card would have. Proving Grounds currently has
+    no confirmed working load-screen detection at all, only the already-reliable
+    matchup screen."""
+    lobby, lobby_conf = _line(frame, LOAD_LOBBY, reader)
+    return lobby_conf >= 0.5 and _resembles(lobby, "WAITINGFOROPPONENT")
 
 
 # Extraction ------------------------------------------------------------------

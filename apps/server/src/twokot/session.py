@@ -24,11 +24,16 @@ from .matching import similarity
 
 
 class ScreenKind(str, Enum):
-    """Screens the pipeline recognises. Values match the capture tool's labels."""
+    """Screens the pipeline recognises. Values mostly match the capture tool's labels -
+    one exception: LOAD_SCREEN has no single matching tag there (the dataset is labeled
+    per location - theater_load_screen, proving_grounds_load_screen, ... - since that's
+    useful for reviewing real captures by eye, but the screen itself is recognised the
+    same way regardless of location, so there's no need for the pipeline to split it)."""
 
     MY_PLAYER = "my_player_load_screen"
     OPPONENT_PLAYER = "opponent_player_load_screen"
     MATCHUP = "player_matchup"
+    LOAD_SCREEN = "load_screen"
     IN_GAME = "in_game"
     GAME_RESULT = "game_result"
     WINNERS_CIRCLE = "winners_circle"
@@ -36,7 +41,10 @@ class ScreenKind(str, Enum):
     OTHER = "other"
 
 
-PREGAME_SCREENS = (ScreenKind.MY_PLAYER, ScreenKind.OPPONENT_PLAYER, ScreenKind.MATCHUP)
+# A load screen is seen before every game, even when a prior one ended without
+# returning all the way to idle (see SessionTracker.observe) - unlike the player cards
+# and matchup screen, which can be missed if those specific frames weren't captured.
+PREGAME_SCREENS = (ScreenKind.MY_PLAYER, ScreenKind.OPPONENT_PLAYER, ScreenKind.MATCHUP, ScreenKind.LOAD_SCREEN)
 END_SCREENS = (ScreenKind.GAME_RESULT, ScreenKind.WINNERS_CIRCLE, ScreenKind.GAME_STATS)
 
 
